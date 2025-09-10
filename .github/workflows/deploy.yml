@@ -1,0 +1,44 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          echo "${{ secrets.API_PRD_KEY }}" | tr -d '\r' > ssh_key
+          chmod 600 ssh_key
+
+      - name: Add host to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.API_PRD_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy files to remote server
+        run: |
+          rsync -av -e "ssh -i ssh_key" \
+            --exclude='.venv' \
+            --exclude='.git' \
+            "$GITHUB_WORKSPACE/" \
+            opc@${{ secrets.API_PRD_HOST }}:/python_bf/api_ocr/
+
+      - name: Setup Python environment
+        run: |
+          ssh -i ssh_key opc@${{ secrets.API_PRD_HOST }} "
+            source /python_bf/api_ocr/.venv/bin/activate &&
+            pip install --upgrade pip &&
+            pip install -r /python_bf/api_ocr/requirements.txt
+          "
+
+      - name: Restart service
+        run: |
+          ssh -i ssh_key opc@${{ secrets.API_PRD_HOST }} "sudo systemctl restart bfocr.service"

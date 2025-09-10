@@ -1,0 +1,48 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+APRENDIZADO/
+src_moreno/
+logs/
+src/resource/pdf/
+
+
+# Caches
+*.cache
+
+# Virtual environments
+env/
+.venv/
+venv/
+ENV/
+
+# Environment variables
+.env
+.env.*
+
+# Logs
+logs/
+*.log
+
+# IDEs e editores
+.idea/
+.vscode/
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Banco de dados
+*.sqlite3
+
+database.cpython-*.pyc
+main.cpython-*.pyc
+models.cpython-*.pyc
+schemas.cpython-*.pyc
+src_moreno/config/__pycache__/
+src_moreno/controller/__pycache__/
+src_moreno/service/__pycache__/
+src_moreno/utils/__pycache__/
+

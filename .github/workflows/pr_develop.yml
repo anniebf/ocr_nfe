@@ -1,0 +1,43 @@
+name: open_pr_to_main
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: read # Necessário para actions/checkout
+  pull-requests: write # Necessário para criar e gerenciar PRs
+
+jobs:
+  create_pr:
+    runs-on: [ self-hosted, linux ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for existing PR and create/update if necessary
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CURRENT_BRANCH="develop"
+          BASE_BRANCH="main"
+          PR_TITLE="Merge $CURRENT_BRANCH into $BASE_BRANCH"
+          PR_BODY="Pull request criado automaticamente pelo GitHub Actions."
+          
+          # Verifica se já existe um PR aberto de develop para main
+          EXISTING_PR=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$CURRENT_BRANCH" --base "$BASE_BRANCH" --json number --jq '.[0].number')
+          
+          if [ "$EXISTING_PR" != "null" ] && [ -n "$EXISTING_PR" ]; then
+            echo "PR já existe, nenhuma nova ação de criação necessária."
+          else
+            echo "Nenhum PR existente de $CURRENT_BRANCH para $BASE_BRANCH. Criando um novo..."
+            gh pr create \
+              --title "$PR_TITLE" \
+              --body "$PR_BODY" \
+              --head "$CURRENT_BRANCH" \
+              --base "$BASE_BRANCH" \
+              --assignee "${{ github.actor }}" \
+              --repo "$GITHUB_REPOSITORY"
+            echo "Pull request criado."
+          fi

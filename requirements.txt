@@ -1,0 +1,13 @@
+httpx~=0.28.1
+uvicorn~=0.34.0
+requests~=2.32.3
+pillow~=11.1.0
+fastapi~=0.115.9
+pydantic~=2.10.6
+SQLAlchemy~=2.0.38
+python-dotenv~=1.0.1
+openai~=1.78.0
+PyPDF2~=3.0.1
+psycopg2-binary~=2.9.10
+python-multipart
+PyMuPDF
