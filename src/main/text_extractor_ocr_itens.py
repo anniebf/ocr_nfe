@@ -69,7 +69,7 @@ def processar_texto(texto):
 
                 resultados['Consumo'] = {
                     'descricao': descricao,
-                    'valor': valores_filtrados
+                    'valores': valores_filtrados
                 }
             except:
                 pass
@@ -185,7 +185,7 @@ for arquivo in os.listdir(PASTA_PDFS):
             for chave, valor in resultado.items():
                 print(f"{chave}:")
                 print(f"  Descrição: {valor['descricao']}")
-                print(f"  Valores: {valor['valores']}")
+                print(f"  Valores: {valor.get('valores', [])}")
                 print()
             print("=" * 80 + "\n")
 
