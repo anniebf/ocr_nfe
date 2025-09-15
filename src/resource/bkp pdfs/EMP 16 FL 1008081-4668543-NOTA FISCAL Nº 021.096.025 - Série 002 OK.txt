@@ -1,0 +1,212 @@
+G 174743- Abril/2021
+
+ROTEIRO: 018 - 0285 - 288 - 3250
+
+MATRÍCULA: 4668543-2025-7-4 Data de Apresentação: 06/08/2025
+DOM. BANC.: DOM. ENT:: Cadastre sua Fatura em Débito Automático.
+Utilize o Código: 0004668543-4
+Classificação: MTO-CONVENCIONAL BAIXA TENSÃO / B2 RURAL/ "
+AGROPECUÁRIA RURAL LIGAÇÃO: BIFASICO
+TENSÃO NOMINAL EM VOLTS — DISP: 127 Lim. Min.: 117 Lim. Max.: 133 Leitura Leitura ;
+Anterior Atual Pr.óx'mª
+1 Datas de Leitura
+BOM FUTURO AGRICOLA LTDA Leituras
+26/06/2025 25/07/2025 29 27/08/2025
+RUA DOZE, SN - 0592801503957000 - 78887970 CÓDIGO DO CLIENTE
+RURAL 6/4668543-4 NOTA FISCAL Nº: 021.096.025 - Série: 002
+BOA ESPERANCA DO NORTE (AG: 167) .
+CÓDIGO DA INSTALAÇÃO DATA DE EMISSÃO:28/07/2025
+CNPJ/CPF/RANI: 1X.XXX.XXX/XXX1-07 Consulte pela Chave de Acesso em:
+Insc. Est.: 140XXXXXX 00000990087 https://www.sefaz.mt.gov.br/nf3e/consulta
+chave de acesso:
+REF: MÊS / ANO VENCIMENTO TOTAL A PAGAR - 5125 0703 4673 2100 0199 6600 2021 0960 2510 5433
+2363
+
+Julho / 2025 16/08/2025 R$ 48,68 [5155000/4630612 - 28/07/2025 18:25:16
+
+Importante: seu número de identificação será atualizado. A partir de 01/12/2025, o número da sua unidade consumidora será alterado, conforme determinação da ANEEL. A mudança é automática e não afeta o seu
+consumo nem o fornecimento de energia.
+
+Preço unit (R$) Valor (R$) PIS/ Base Calc. % Alíq. ICMS Tarifa
+ltens da Fatura Unid. Quant. com tributos COFINS (R$) ICMS(R$) ICMS (R$) uUnit R$| Tributo Base de Alíquota
+álc.(R: Y
+Custo de Disponibilidade KWH 50,00 0,902280 45,11 2,51 0,00 Q 0,00 0,852130 Cálc.(R$) — (%)
+Adic. B. Vermelha 2,36 0,13 000 O 0,00 PIS 47,A7  0,9917
+LANÇAMENTOS E SERVIÇOS ICâIFs'NS 47,47 4,505ãã
+JUROS DE MORA 06/2025 0,21 0,00 i
+MULTA 06/2025 0,95
+ATUALIZAÇÃO MONETÁRIA 06/2025 0,05
+Nº DIAS
+CONSUMO FATURADO FAT
+JUL/25 29
+JUN/25 29
+MAI/25 30
+ABR/25 32
+MAR/25 29
+FEV/25 30
+JAN/25 31
+DEZ/24 30
+NOV/24 33
+OUT/24 29
+SET/24 24
+AGO/24
+JUL/24
+TOTAL: 48,68 2,64 0,00 0,00
+
+Medidor Grandezas Leitura Leitura Const Consumo RES RVADgºàlº FISCO
+
+E
+Anterior Atual Medidor kwh Art. 130-C do anexo IV do RICMS/MT -
+
+00000990087 Energia ativa em kWh 77621 77621 1
+
+341-7] 34191.09214 66637.502932 85972.060009 9 11750000004868 Pague por
+
+LOCAL DE PAGAMENTO VENCIMENTO
+PAGAR PREFERENCIALMENTE NO ITAU 16/08/2025 P I x
+
+BENEFICIÁRIO CNPJ | Ag/COD. BENEFICIÁRIO
+ENERGISA MATO GROSSO - DISTRIBUIDORA DE ENERGIA S.A. 03.467.321/0001-99 2938/59720-6
+
+ENDEREÇO " , NOSSO NÚMERO
+R VEREADOR JOÃO BARBOSA CARAMURU, 184 - BANDEIRANTE - CUIABÁ / MT - CEP 78010-900 109/21666375-0
+DATA DO DOCUMENTO Nº DOCUMENTO ESPÉCIE DOC ACEITE DATA DO PROCESSAMENTO * | (=)VALOR DO DOCUMENTO
+28/07/2025 4668543-2025-07-4 DS N 28/07/2025 48,68
+é -) DESCONTOS/
+CARTEIRA 109 EsPÉcCIE R$ QUANTIDADE VALOR
+
+OS VALORES DA MULTA/JUROS DE MORA POR ATRASO SO SERÃO COBRADOS DEDUÇÕES
+
+NA PRIMEIRA FATURA APÓS O PAGAMENTO DESTA.
+
+TITULO SUJEITO A PROTESTO APÓS O VENCIMENTO.
+NÃO ACEITAMOS DEPÓSITO EM CONTA CORRENTE. CASO OCORRA, O MESMO NÃO QUITARÁ ESTA FATURA. :ªº_';ifgªªºº
+COBRADO
+
+PAGADOR CPF/CNPJ
+BOM FUTURO AGRICOLA LTDA 10.425.282/0081-07
+RUA DOZE, SN - 0592801503957000 - BOA ESPERANCA DO NORTE (AG: 167)
+
+SACADOR/ AVALISTA CÓD. DE BAIXA
+
+AUTENTICAÇÃO MECÂNICA Receba sua conta só com o PIX
+Cadastre-se em nossos canais
+Ficha de Compensação
+
+ATENÇÃO
+
+- -Reajuste tarifário médio 1,79%, a partir de 08/04/25, conforme REH Nº 3.440/ANEEL
+- Leitura confirmada
+
+SITUAÇÃO DE DÉBITOS
+
+INDICADORES DE QUALIDADE CONSUMO DOS ÚLTIMOS 43 MESES
+
+LIMITES MENSAL —APUR TRIM. — ANUAL mÊS CONSUMO DEMANDA — CONS. CONSUMO DEMANDA ERE DRE ERE DRE CONS. ERE DEMANDA
+DA ANEEL FATURADO — MEDIDA FAT FATURADO — MEDIDA MEDIDA
+DIC 33,00 0,07 0,00 0,00  JUL/25 *
+FIC 8,00 1,00 0,00 0,00 JUN/25
+DMIC 24,00 0,07 MAI/25
+DICRI 26,00 ABR/25
+MAR/25
+Conjunto: BOA ESPERANCA FEV/25
+JAN/25
+Referência: 05/2025 DEZ/24
+Tensão Contratada: 127 NOV/24
+Limite Adequado: 117 a 133 OUT/24
+SET/24
+AGO/24
+JUL/24
+energia no período
+DICRI: Duração da Interrupção individual em dia critico PONTA mr:m:. FORA DE PONTA PONTA FORA DE PONTA RESERVADO TUSDG
+DIÁRIA
+. *FATURAMENTO PELA MÉDIA/MÍNIMO
+COMPOSIÇÃO DO CONSUMO ESTRUTURA DO CONSUMO
+DADOS DA LEITURA DADOS DO CONSUMO T
+Leitura Anterior:26/06/2025 — Leitura Atual: 25/07/2025 Dias: 29
+DESCRIÇÃO VALOR (RS) % um POSTO ATUAL ANTERIOR K PERDAS (%) FAT. POT. A). FAT. POT. MEDIDO FATURADO
+Serviço de distribuição 14,98 30,78 KWH — Ponta 77.621,00 77.621,00 1,00 0,00 0,00 0,00 0,00 50,00
+Compra de energia 20,72 42,56
+Serviço de transmissão 2,43 499
+Encargos setoriais 6,70 13,76
+Impostos diretos e encargos 3,85 7,91
+Outros serviços 0,00 0,00 ."
+Total 48,68 100,00 ;
+
+Encargo de Uso do Sistema de Distribuição
+(Ref 05/2025): R$ 15,99
+
+DADOS DA DEMANDA * KWTG: Dem Tusdg * K: Const Med
+
+FIQUE ATENTO
+
+Informações sobre condições gerais do fornecimento, tarifás, produtos, serviços prestados e impostos estão disponíveis para consulta em nossas ágências de atendimento e no site.
+Assim como, dados sobre apuração dos indicadores de continuidade, de tensão e limites aplicáveis também podem ser obtidos por meio do endereço eletrônico www.energisa.com.br.
+
+Pagando sua conta em dia, você evita cobrança de muita de 2%, atualização monetária com base na váriação do IGP-M, juros de mora de 1% ao mês, corte no fornecimento de energia
+e demais transtornos. O pagâmento desta conta não quita débitos anteriores.
+
+Caáso não efetue o pagamento de sua conta de luz até à data do vencimento, uma vez vencida, você estará sujeito à inclusão de seu nome nos órgãos de proteção ào crédito (SPC, SERASA,
+SCPC), e também estárá sujeito ao protesto do documento junto aos órgãos competentes, devendo aárcar com todos os custos pára retirada do protesto.
+
+Central de Atendimento Energisa: 0800 646 4196
+Central de Atendimento Energisa (alta e média tensão): 0800 648 4196
+Atendimento Energisa para deficiente auditivo ou de fala: 0800 648 1782
+
+tocolo de até
+
+Q 800 06 horário comercial) - Necessário te imero d
+
+De!
+
+ONDE PAGAR SUA CONTA
+
+Autoatendimento e Internet:
+
+Banco do Brasil / Banco Bradesco / Banco Bancoob
+(Sicoob) / Banco Inter / Banco Safra / Banco Santander /
+Banco de Brasília / Caixa Econômica Federal /
+Mercantil do Brasil / Banco Itaú / Sicredi / Primacredi /
+Banco Original
+
+Agentes Credenciados: —':';
+Caixa Econômica Federal (Casas Lotéricas e Caixa Aqui) /
+
+Banco do Brasil (Correspondentes Bancários) / Bradesco
+(Correspondentes Bancários) / Bancoob (Sicoob) / Sicredi
+
+(Agentes Credenciados) / Tribanco
+
+E Débito Automático:
+
+Banco do Brasil / Banco da Amazônia /
+Bradesco / Santander / Itaú / Mercantil do
+Brasil / Sicredi / Banco de Brasília / Inter /
+Caixa Econômica Federa! / Bancoob (Sicoob) /
+Banco Original / Unicred
+
+Chegamos
+no WhatsApp!
+
+Agora você pode solicitar a 2º via
+das suas faturas, religação e tirar
+dúvidas através da nossa assistente
+virtual no Whatsapp.
+
+Adicione o nosso número
+nos seus contatos:
+65 9 9999-7974
+
+Baixe o Energisa On
+no seu smartphone:
+
+Mais comodidade e facilidade no seu
+relacionamento conosco,
+
+Com o Energisa On você pode solicitar
+serviços, esclarecer dúvidas e muito mais.
+
+Disponível para Android e (OS em
+energisa.com.br/energisaon
+
+

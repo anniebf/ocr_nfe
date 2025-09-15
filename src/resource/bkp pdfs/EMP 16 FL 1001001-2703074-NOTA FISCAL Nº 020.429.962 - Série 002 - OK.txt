@@ -1,0 +1,397 @@
+G 174743- Abril/2021
+
+ROTEIRO: 021 - 0137 - 901 - 0010
+MATRÍCULA: 0002703074-2025-07-1
+
+DOM. BANC.: 00001 03307 00000000021613
+
+DOM. ENT::
+
+Classificação: MTV-MOD.TARIFÁRIA VERDE / AGA INDUSTRIAL /
+
+INDUSTRIAL
+
+TENSÃO NOMINAL EM VOLTS — DISP:
+
+34500
+
+BOM FUTURO AGRICOLA LTDA
+
+EST ESTRADA RURAL, 0 - MT 249, KM 104, CGH CORRENTAO - 78435000
+
+RURAL
+SAO JOSE DO RIO CLARO (AG: 20)
+
+CNPJ/CPF: 1X.XXX.XXX/XXX1-22
+Insc. Est.: 133XXXXXX
+
+LIGAÇÃO: TRIFASICO
+
+Lim. Min.: 32085
+
+Lim. Max.: 36225
+
+1
+
+CÓDIGO DO CLIENTE
+
+6/2703074-1
+
+CÓDIGO DA INSTALAÇÃO
+W9004972250
+
+Datas de
+Leituras
+
+REF: MÊS / ANO VENCIMENTO TOTAL A PAGAR
+Julho / 2025 16/08/2025 R$ 55.299,80
+Preço unit (R$) Valor (R$) PIS/ Base Calc. % Alíq.
+ltens da Fatura Unid. Quant. com tributos COFINS (R$) ICMS(R$) ICMS
+Consumo em kWh - Fora Ponta KWH 93,60 0,533220 49,91 2,52 49,91 17
+Energia Atv Injetada GDI - Fora Ponta KWH 93,60 0,533220 -49,91 -2,52 4991 17
+Energia Reativa Exced em KWh - Fponta UN 86,40 0,3888250 33,54 1,69 33,54 17
+Demanda de Potência Medida - Fora Ponta KW 72,00 41,999340 3.023,95 152,60 3.023,95 - 17
+Demanda Potência Reativa Exced - F Ponta KW 10,80 41,999340 453,59 22,89 453,59 17
+Demanda Potência Ativa - Ultrap - F Ponta KW 42,00 83,998680 3.527,94 178,04 3.527,94 17
+Demanda de Geração TUSDG KW 2.628,00 18,356040 48.239,69 — 2.932,97 0,00 O
+LANÇAMENTOS E SERVIÇOS
+Contrib de Ilum Pub 21,09 0,00 0,00 O
+TOTAL: 55299,8 3.288,19 7.039,02
+
+Medidor
+
+W9004972250 Energia ativa em kWh
+W9004972250 Energia injetada
+W9004972250 Energia ativa em kWh
+W9004972250 Energia injetada
+
+MATRÍCULA
+
+2703074-2025-7-1
+
+Postos
+horários
+
+Ponta
+Ponta
+Fora Ponta
+Fora Ponta
+
+Leitura
+Anterior
+
+1386,795
+1303,933
+1382,004
+
+15295,135
+
+Leitura
+Atual
+
+136,795
+1308,531
+1382,03
+
+15378,589
+
+Const Consumo
+Medidor kwh
+
+3600 o
+3600 6552,/799999
+3600 93,6
+3600 10434,399999
+
+Leitura Leitura
+Anterior Atual
+
+ICMS
+(R$)
+8,48
+
+-8,48
+5,70
+
+514,07
+
+77M
+
+599,75
+0,00
+
+0,00
+
+1.196,63
+
+NOTA FISCAL/CONTA DE ENERGIA ELÉTRICA
+
+VENCIMENTO
+16/08/2025
+
+Nº FATURA
+20429962
+
+Data de Apresentação: 09/07/2025
+Cadastre sua Fatura em Débito Automático.
+Utilize o Código: 0002703074-1
+
+Próxima
+
+Leitura
+
+31/05/2025 30/06/2025 30 31/07/2025
+
+NOTA FISCAL Nº: 020.429.962 - Série: 002
+
+DATA DE EMISSÃO:03/07/2025
+Consulte pela Chave de Acesso em:
+https://www.sefaz.mt.gov.br/nf3e/consulta
+
+chave de acesso:
+
+5125 0703 4673 2100 0199 6600 2020 4299 6210 6626
+
+3469
+
+Protocolo de Autorização:
+1512500072896288 - 03/07/2025 16:23:51
+
+Tarifa
+unit R$ | Tributo Base de Alíquota
+0,415670 Cále.(R$) — (%)
+0,415670 | PIS 54.082,06 — 1,0845
+0,302660 | COFINS 54.082,06 — 4,9955
+32740000 | ICMS 7.039,02 — 17,00
+32,740000
+65,480000
+17,240000
+
+Demanda ponta - kW
+Demanda fora ponta - kW
+Demanda TUSDG - kW
+
+RESERVADO AO FISCO
+LC 708/2021 (RICMS/MT) - Art. 14, VII, "b"
+
+TOTAL A PAGAR
+R$ 55.299,80
+
+FATURA A SER QUITADA ATRAVÉS DE DÉBITO AUTOMÁTICO À
+CONSIDERAR ESTA NOTA FISCAL QUITADA SOMENTE APÓS O EFETIVO DÉBITO
+
+NO BANCO 0001
+
+Valor
+(R$)
+586,52
+2.701,67
+1.196,63
+
+30
+2700
+
+
+ATENÇÃO
+
+UC com Minigeração classificada como GD | para faturamento, conforme Lei 14.300/22
+Saldo Ac: 61.387(P) 624.090(FP) A expirar em 08/2025: 0(P) O(FP)
+Rever. da Isen. do ICMS sobre Ener. Inj. conf Processo Judicial 1001864472023811
+
+- -Reajuste tarifário médio 1,79%, a partir de 08/04/25, conforme REH Nº 3.440/ANEEL
+
+SITUAÇÃO DE DÉBITOS
+
+INDICADORES DE QUALIDADE CONSUMO DOS ÚLTIMOS 43 MESES
+
+LIMITES MENSAL —APUR TRIM. — ANUAL mÊS CONSUMO  DEMANDA
+DA ANEEL FATURADO — MEDIDA
+DIC 33,00 0,00 0,00 0,00 JUL/25 0,00
+FIC 7,00 0,00 0,00 0,00 JUN/25 1.800,00 216,00
+DMIC 24,00 0,00 MAI/25 61,20 144,00
+DICRI 24,00 ABR/25 0,00
+MAR/25 25,20 57,60
+Conjunto: UT SAO JOSE RIO FEV/25 18,00 72,00
+OILARON R4 RKV JAN/25 0,00
+Referência: 05/2025 DEZ/24 28,80 86,40
+Tensão Contratada: 34500 NOV/24 0,00
+Limite Adequado: 32085 a 36225 OUT/24 0,00
+ES RÇA RESNAA SET/24 147,60 288,00
+RETTA AGO/24 568,80 216,00
+JUL/24 61,20 187,20
+DMIC: Duração da maior h vpção de energia no período
+DICRI: Duração da Interrupção Iindividiual em dia eritico PONTA
+
+CONS.
+FAT.
+
+0,00
+0,00
+0,00
+0,00
+0,00
+0,00
+0,00
+0,00
+0,00
+0,00
+0,00
+0,00
+
+INTERME:
+DIÁRIA
+
+CONSUMO DEMANDA ERE DRE ERE DRE CONS. — ERE DEMANDA
+FATURADO MEDIDA MEDIDA
+93,60 72,00 86,40 10,80 2.505,60
+12.204,00 24480 — 550,80 4.500,00 — 68,40 2.548,80
+468,00 144,00 10,80 43,20 2.606,40
+154,80 100,80 43,20 2.635,20
+446,40 417,60 3,60 108,00 2.664,00
+212,40 100,80 7,20 93,60 2.606,40
+93,60 43,20 36,00 2.620,80
+32,40 72,00 7,20 14,40 2.649,60
+25,20 43,20 7,20 2.736,00
+10,80 43,20 3,60 907,20
+4.525,20 648,00 — 378,00 4.539,60 2.836,80
+4.701,60 835,20 — 2.574,00 B.58240 — 7,20 2.995,20
+1.350,00 820,80 1.040,40 3.758,40
+FORA DE PONTA PONTA FORA DE PONTA RESERVADO TUSDG
+
+. *FATURAMENTO PELA MÉDIA/MÍNIMO
+COMPOSIÇÃO DO CONSUMO ESTRUTURA DO CONSUMO
+
+DADOS DA LEITURA
+
+DESCRIÇÃO VALOR (R$) % UN POSTO
+Serviço de distribuição 16.965,15 30,68 KWH
+Compra de energia 23.482,02 42,46 INJ
+Serviço de transmissão 2.758,11 4,99 KWH
+Encargos setoriais 7.588,61 13,72 INJ
+Impostos diretos e encargos 4.505,91 815 KW
+Outros serviços 0,00 0,00 ULTP
+Total 55.299,80 100,00 ÉZ(V; S
+Encargo de Uso do Sistema de Distribuição ERE
+(Ref 05/2025): R$ 47.588,06 DRE
+
+Ponta
+
+Ponta
+
+FPonta
+FPonta
+FPonta
+FPonta
+FPonta
+Ponta
+
+FPonta
+FPonta
+
+DADOS DA DEMANDA
+
+DADOS DO CONSUMO
+
+Leitura Anterior:31/05/2025 — Leitura Atual: 30/06/2025 Dias: 30
+
+ATUAL
+
+186,80
+1.308,53
+1.382,03
+
+15.378,59
+0,02
+
+0,02
+
+0,70
+24,87
+66,52
+0,02
+
+KW Ponta:
+
+ANTERIOR K PERDAS (%) FAT. POT. A). FAT. POT. MEDIDO FATURADO
+136,80  3.600,00 0,00 0,00 0,00 0,00 0,00
+1.303,98 — 3.600,00 0,00 0,00 0,00 16.552,80 0,00
+1.3882,00  3.600,00 0,00 0,00 0,00 93,60 93,60
+15.295,14 / 3.600,00 0,00 0,00 0,00 300.434,40 93,60
+0,00 3.600,00 0,00 0,00 0,00 72,00 72,00
+0,00 3.600,00 0,00 0,00 0,00 72,00 42,00
+0,00 3.600,00 0,00 0,00 0,00 2.505,60 2.628,00
+24,87 3.600,00 0,00 0,00 0,00 0,00 0,00
+66,50 — 3.600,00 0,00 0,00 0,00 86,40 86,40
+0,00 3.600,00 0,00 0,00 0,00 82,80 10,80
+
+Fora Ponta: 30 TUSDG: 2700 * KWTG: Dem Tusdg * K: Const Med
+
+FIQUE ATENTO
+
+Informações sobre condições gerais do fornecimento, tarifás, produtos, serviços prestados e impostos estão disponíveis para consulta em nossas ágências de atendimento e no site.
+
+Assim como, dados sobre apuração dos indicadores de continuidade, de tensão e limites aplicáveis também podem ser obtidos por meio do endereço eletrônico www.energisa.com.br.
+
+Pagando sua conta em dia, você evita cobrança de muita de 2%, atualização monetária com base na váriação do IGP-M, juros de mora de 1% ao mês, corte no fornecimento de energia
+e demais transtornos. O pagâmento desta conta não quita débitos anteriores.
+
+Caáso não efetue o pagamento de sua conta de luz até à data do vencimento, uma vez vencida, você estará sujeito à inclusão de seu nome nos órgãos de proteção ào crédito (SPC, SERASA,
+SCPC), e também estárá sujeito ao protesto do documento junto aos órgãos competentes, devendo aárcar com todos os custos pára retirada do protesto.
+
+E=
+
+Débito Automático:
+
+Banco do Brasil / Banco da Amazônia /
+Bradesco / Santander / Itaú / Mercantil do
+Brasil / Sicredi / Banco de Brasília / Inter /
+
+Caixa Econômica Federa! / Bancoob (Sicoob) /
+
+Banco Original / Unicred
+
+Chegamos
+no WhatsApp!
+
+Agora você pode solicitar a 2º via
+das suas faturas, religação e tirar
+dúvidas através da nossa assistente
+virtual no Whatsapp.
+
+Adicione o nosso número
+nos seus contatos:
+65 9 9999-7974
+
+Central de Atendimento Energisa: 0800 646 4196
+Central de Atendimento Energisa (alta e média tensão): 0800 648 4196
+Atendimento Energisa para deficiente auditivo ou de fala: 0800 648 1782
+
+ONDE PAGAR SUA CONTA
+
+Agentes Credenciados:
+
+Caixa Econômica Federal (Casas Lotéricas e Caixa Aqui) /
+Banco do Brasil (Correspondentes Bancários) / Bradesco
+(Correspondentes Bancários) / Bancoob (Sicoob) / Sicredi
+(Agentes Credenciados) / Tribanco
+
+àí—j Autoatendimento e Internet:
+Banco do Brasil / Banco Bradesco / Banco Bancoob
+(Sicoob) / Banco Inter / Banco Safra / Banco Santander /
+Banco de Brasília / Caixa Econômica Federal /
+Mercantil do Brasil / Banco Itaú / Sicredi / Primacredi /
+Banco Original
+
+Baixe o Energisa On
+no seu smartphone:
+
+Mais comodidade e facilidade no seu
+relacionamento conosco,
+
+Com o Energisa On você pode solicitar
+serviços, esclarecer dúvidas e muito mais.
+
+Disponível para Android e (OS em
+energisa.com.br/energisaon
+
+
