@@ -1,24 +1,53 @@
-# Document Extraction API
+# Document Extraction API - Contas de Energia
 
-RPA PARA AUTOMACAO DO LANCAMENTOS DOS DOCUMENTOS DE ENTRADA DA ENERGIA.
+Automação RPA  para o processamento e lançamento de documentos de entrada de energia elétrica.
+
+Este projeto tem como objetivo **extrair de forma automatizada informações de faturas de energia elétrica em PDF**, garantindo maior eficiência na integração desses dados em sistemas internos ou bancos de dados corporativos.
+
+## Confguracoes do python 
+-Versão do python: 3.12
 
 ## Funcionalidades
-- Extração de dados das contas de energia em pdf
 
-## Instalação
+- **Extração de dados do cabeçalho da fatura**:
+  - Nome do titular (ainda nao teminado)
+  - Distribuidora de energia
+  - CNPJ da distribuidora
+  - Número e série da nota fiscal
+  - Código do cliente
+  - Data de emissão
+  - Chave de acesso
+  - Valor total da fatura
+- **Extração detalhada dos itens da fatura**:
+  - Consumo e custo
+  - Energia injetada
+  - Bandeiras tarifárias
+  - Taxa de iluminacao publica
+- **Extração dos Atributos**:
+  - ICMS
+  - CONFINS
+  - PIS
 
-1. Clone o repositório:
-   ```bash
-   git clone <repo-url>
-   cd image-extractor
-   ```
-2. Instale as dependências:
-   ```bash
-   pip install -r requirements.txt
+- **Saída estruturada em JSON no prompt de comando**
+  - Melhoria futura - retornar o json em uma pasta especifica
+
+## Funcionalidades
+
+- **iNTEGRACAO COM O BANCO PARA INSERÇÃO DOS INFROMACOES**
+- ** **
+image-extractor/
+│
+├─ src/
+│ ├─ main/
+│ │ ├─ text_extractor_ocr_cabecalho.py # Extrai informações do cabeçalho da fatura
+│ │ ├─ text_extractor_ocr_itens.py # Extrai apenas os valores monetários dos itens
+│ │ └─ text_extractor_ocr_itens_atributos.py # Extrai atributos detalhados e colunas dos itens
+│ │
+│ └─ resource/
+│ └─ pdf/ # PDFs de exemplo para testes
+│
+├─ requirements.txt # Dependências do projeto
+└─ README.md
 
 ## Estrutura do Projeto
-- `text_extractor_ocr_cabecalho.py` — extrai o cabeçalho da conta de luz
-- `text_extractor_ocr_itens.py` — extrai os itens da fatura, e retorna somente o valor deles
-- `text_extractor_ocr_itens.py` — extrai os atributos e as 3 colunas deles
-
 
