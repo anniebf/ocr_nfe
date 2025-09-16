@@ -130,7 +130,6 @@ def processar_texto(texto):
         # Energia Injetada
         elif 'Injetada' in linha_limpa:
             partes = linha_limpa.split()
-            #print(partes)
             try:
                 #Cria uma lista de indices onde a palavra "Injetada" aparece na linha
                 idx_injetada = [i for i, p in enumerate(partes) if 'Injetada' in p]
@@ -144,24 +143,9 @@ def processar_texto(texto):
                         kwh_index = idx
                     #Pega todos os elementos da lista após o índice de "KWH"
                     valores = partes[kwh_index + 1:]
-                    print(valores)
-                    try:
-                        # Procura especificamente por "KwWH" (case insensitive)
-                        # Usando 'KWWH' ou variações similares
-                        kw_index = next(i for i, v in enumerate(valores) if v.upper() in ['KWWH', 'KWH', 'KWW'])
-                    except StopIteration:
-                        kw_index = -1
+                    #Filtra a lista para manter somente strings quie contenham numeros
+                    valores_filtrados = [v for v in valores if re.search(r'[-]?\d+[.,]?\d*', v)]
 
-                    # Filtra a lista para manter somente strings que contenham números
-                    if kw_index >= 0:
-                        # Pega apenas os valores a partir de "KwWH" + 1
-                        valores_apos_kw = valores[kw_index + 1:]
-                        # Filtra apenas valores numéricos (mais restritivo)
-                        valores_filtrados = [v for v in valores_apos_kw if re.search(r'^[-]?\d+[.,]?\d*[.,]?\d*$', v)]
-                    else:
-                        # Fallback: filtra todos os valores numéricos (abordagem original)
-                        valores_filtrados = [v for v in valores if re.search(r'^[-]?\d+[.,]?\d*[.,]?\d*$', v)]
-                    print(valores_filtrados)
                     if len(valores_filtrados) >= 3:
                         #Filtra somente o Valor da energia no indice 2 (coluna Valor)
                         valores_filtrados = [valores_filtrados[2]]
@@ -243,7 +227,7 @@ for arquivo in os.listdir(PASTA_PDFS):
                 texto = pytesseract.image_to_string(imagem, lang='por')
                 texto_completo += texto + "\n"
 
-            #print(texto_completo)
+            print(texto_completo)
             secao_tributos = extrair_secao_tributos(texto_completo)
 
             print("\n✅ SEÇÃO DE TRIBUTOS EXTRAÍDA:")
@@ -253,7 +237,7 @@ for arquivo in os.listdir(PASTA_PDFS):
             for chave, valor in resultado.items():
                 print(f"{chave}:")
                 print(f"  Descrição: {valor['descricao']}")
-                print(f"  Valor: {valor.get('valores', [])}")
+                print(f"  Valores: {valor.get('valores', [])}")
                 print()
             print("=" * 80 + "\n")
 
