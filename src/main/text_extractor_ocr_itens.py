@@ -5,7 +5,11 @@ import re
 
 """ Terceiro codigo para pegar os itens dos pdfs de conta de energia
     Pegando somente os valores e descricao dos itens que foram passados pelo analista 
-    """
+"""
+
+##
+##USANDO PYTESSERACT E PLOPPLERS PARA LER OS PDFS
+##
 
 # Configuraçoes padrao
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -130,10 +134,10 @@ def processar_texto(texto):
         # Energia Injetada
         elif 'Injetada' in linha_limpa:
             partes = linha_limpa.split()
-            #print(partes)
+            print(partes)
             try:
                 #Cria uma lista de indices onde a palavra "Injetada" aparece na linha
-                idx_injetada = [i for i, p in enumerate(partes) if 'Injetada' in p]
+                idx_injetada = [i for i, p in enumerate(partes) if 'KwWH' in p or 'KWH' in p]
                 for idx in idx_injetada:
                     #Cria a descrição do item, pegando todas as palavras desde o início da linha até a palavra "Injetada"
                     descricao = ' '.join(partes[:idx + 1])
@@ -144,7 +148,7 @@ def processar_texto(texto):
                         kwh_index = idx
                     #Pega todos os elementos da lista após o índice de "KWH"
                     valores = partes[kwh_index + 1:]
-                    print(valores)
+                    #print(valores)
                     try:
                         # Procura especificamente por "KwWH" (case insensitive)
                         # Usando 'KWWH' ou variações similares

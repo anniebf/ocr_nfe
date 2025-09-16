@@ -1,15 +1,14 @@
-from pdf2image import convert_from_path
-import pytesseract
+
 import pdfplumber
 import re
 import json
 import os
-import cv2
-import numpy as np
+
 
 # Configurar caminho do Tesseract no Windows
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
+##
+##USANDO PDFPLUMBER PARA LER OS PDFS
+##
 
 def corrigir_caracteres_duplicados(texto):
     """
@@ -155,14 +154,7 @@ for arquivo in os.listdir(PASTA_PDFS):
                     texto_filtrado = cropped.extract_text(x_tolerance=2, y_tolerance=2)
                     texto = texto_filtrado or ""
 
-                    print(texto)
-
-                    # Extrai a imagem da página inteira para OCR
-                    pages_img = convert_from_path(caminho_pdf, dpi=300, first_page=1, last_page=1,
-                                                  poppler_path=r"C:\poppler-24.08.0\Library\bin")
-                    img = pages_img[0]
-                    texto_ocr = pytesseract.image_to_string(img, lang='por')
-
+                    #print(texto)
                     # Chama a função única para extrair todos os dados
                     resultado = extrair_dados_texto(texto)
 

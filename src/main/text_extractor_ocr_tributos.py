@@ -1,9 +1,10 @@
 import re
-import pytesseract
 import pdfplumber
 import os
 
-pytesseract.pytesseract.tesseract_cmd = r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
+##
+##USANDO PDFPLUMBER PARA LER OS PDFS
+##
 
 PASTA_PDFS = r"C:\bf_ocr\src\resource\pdf"
 
