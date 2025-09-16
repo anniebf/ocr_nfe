@@ -1,8 +1,17 @@
 import pdfplumber
-from PIL import Image
 import numpy as np
 import re
 import json
+
+
+""" -PASSO A PASSO-
+ - Recorta o pdf apenas na parte que nao é da cor branca
+ - Leitura da parte seleceionada
+ - Regex procura as palavras chaves
+ - Retorna o json
+ 
+"""
+
 
 def corrigir_caracteres_duplicados(texto):
     """
