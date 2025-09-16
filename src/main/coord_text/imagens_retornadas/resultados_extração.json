@@ -1,0 +1,56 @@
+{
+  "mais_a_cima": {
+    "tipo": "texto",
+    "conteudo": "DANF3E - DOCUMENTO AUXILIAR DA NOTA FISCAL DE ENERGIA ELÉTRICA ELETRÔNICA\nRua Vereador João Barbosa Caramuru, 184\nCuiabá/MT - CEP 78010-900\nCNPJ 03.467.321/0001-99     Insc. Est. 13.020.425-0\nENERGISA MATO GROSSO - DISTRIBUIDORA DE ENERGIA S.A.",
+    "descricao": "Área mais acima do documento"
+  },
+  "roteiro_tensao": {
+    "tipo": "texto",
+    "conteudo": "TENSÃO NOMINAL EM VOLTS     DISP:\n34500\nLim. Min.: 32085\nLim. Max.:  36225\nClassificação: MTV-MOD.TARIFÁRIA VERDE / A3A  INDUSTRIAL /\nINDUSTRIAL\nTRIFASICO\nLIGAÇÃO:\nDOM.  ENT.:\nROTEIRO: 021 - 0137 - 901 - 0010\nDOM.  BANC.: 00001 03307 00000000021613\nMATRÍCULA: 0002703074-2025-07-1",
+    "descricao": "Roteiro e tensão"
+  },
+  "nota_fiscal_protocolo": {
+    "tipo": "texto",
+    "conteudo": "NOTA FISCAL Nº: 020.429.962 - Série: 002\nDATA DE EMISSÃO:03/07/2025\nConsulte pela Chave de Acesso em:\nhttps://www.sefaz.mt.gov.br/nf3e/consulta\nchave de acesso:\n5125 0703 4673 2100 0199 6600 2020 4299 6210 6626\n3469\nProtocolo de Autorização:\n1512500072896288 - 03/07/2025 16:23:51",
+    "descricao": "Nota fiscal e protocolo"
+  },
+  "nome_endereco": {
+    "tipo": "texto",
+    "conteudo": "BOM FUTURO AGRICOLA LTDA\nEST ESTRADA RURAL, 0 - MT 249, KM 104, CGH CORRENTAO - 78435000",
+    "descricao": "Nome e endereço"
+  },
+  "codigo_cliente": {
+    "tipo": "texto",
+    "conteudo": "6/2703074-1",
+    "descricao": "Código do cliente"
+  },
+  "ref_total_pagar": {
+    "tipo": "texto",
+    "conteudo": "Julho / 2025\n16/08/2025\nR$ 55.299,80",
+    "descricao": "Referência e total a pagar"
+  },
+  "itens_fatura": {
+    "tipo": "tabela",
+    "cabecalhos": [
+      "Item",
+      "Unidade",
+      "Quantidade",
+      "Preço Unitário (R$)",
+      "Valor (R$)",
+      "PIS/COFINS (R$)",
+      "Base ICMS (R$)",
+      "ICMS (R$)",
+      "Tarifa Unitária (R$)"
+    ],
+    "dados": [],
+    "texto_original": "PIS/\nBase Calc.\nICMS\n% Alíq.\nUnid.\nQuant.\ncom tributos\nPreço unit (R$)\nValor (R$)\n0,533220\nICMS (R$)\n0,533220\n0,388250\n41,999340\n41,999340\n83,998680\n18,356040\n93,60\n49,91\n-49,91\n33,54\n3.023,95\n453,59\n3.527,94\n0,00\n0,00\n-8,48\n5,70\n514,07\n77,11\n599,75\n0,00\n0,00\nICMS\n(R$)\nunit R$\nTarifa\n0,415670\n0,415670\n0,302660\n32,740000\n32,740000\n65,480000\n17,240000\n8,48\nCOFINS (R$)\n49,91\n2,52\n-49,91\n-2,52\n33,54\n1,69\n3.023,95\n152,60\n453,59\n22,89\n3.527,94\n178,04\n48.239,69\n2.932,97\n21,09\n0,00\nItens da Fatura\nConsumo em kWh - Fora Ponta\nEnergia Atv Injetada GDI - Fora Ponta\nEnergia Reativa Exced em KWh - Fponta\nDemanda de Potência Medida - Fora Ponta\nDemanda Potência Reativa Exced - F Ponta\nDemanda Potência Ativa - Ultrap - F Ponta\nDemanda de Geração TUSDG\nLANÇAMENTOS E SERVIÇOS\nContrib de Ilum Pub\n93,60\n86,40\n72,00\n10,80\n42,00\n2.628,00\nKWH\nKWH\nUN\nKW\nKW\nKW\nKW\n17\n17\n17\n17\n17\n17\n0\n0",
+    "descricao": "Itens da fatura"
+  },
+  "tributos": {
+    "tipo": "tabela",
+    "cabecalhos": [],
+    "dados": [],
+    "texto_original": "(R$)\n(%)\nCálc.(R$)\n586,52\n2.701,67\n1,0845\n4,9955\n17,00\n54.082,06\n54.082,06\n7.039,02\n1.196,63\nPIS\nICMS\nCOFINS",
+    "descricao": "Tributos"
+  }
+}

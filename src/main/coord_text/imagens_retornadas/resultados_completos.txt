@@ -1,0 +1,210 @@
+RESULTADOS DA EXTRAÇÃO
+============================================================
+
+ÁREA MAIS ACIMA DO DOCUMENTO
+----------------------------------------
+TIPO: TEXTO
+DANF3E - DOCUMENTO AUXILIAR DA NOTA FISCAL DE ENERGIA ELÉTRICA ELETRÔNICA
+Rua Vereador João Barbosa Caramuru, 184
+Cuiabá/MT - CEP 78010-900
+CNPJ 03.467.321/0001-99     Insc. Est. 13.020.425-0
+ENERGISA MATO GROSSO - DISTRIBUIDORA DE ENERGIA S.A.
+
+============================================================
+
+ROTEIRO E TENSÃO
+----------------------------------------
+TIPO: TEXTO
+TENSÃO NOMINAL EM VOLTS     DISP:
+34500
+Lim. Min.: 32085 
+Lim. Max.:  36225
+Classificação: MTV-MOD.TARIFÁRIA VERDE / A3A  INDUSTRIAL / 
+INDUSTRIAL 
+TRIFASICO
+LIGAÇÃO:
+DOM.  ENT.:
+ROTEIRO: 021 - 0137 - 901 - 0010
+DOM.  BANC.: 00001 03307 00000000021613
+MATRÍCULA: 0002703074-2025-07-1
+
+============================================================
+
+NOTA FISCAL E PROTOCOLO
+----------------------------------------
+TIPO: TEXTO
+NOTA FISCAL Nº: 020.429.962 - Série: 002 
+DATA DE EMISSÃO:03/07/2025
+Consulte pela Chave de Acesso em:
+https://www.sefaz.mt.gov.br/nf3e/consulta
+chave de acesso:
+5125 0703 4673 2100 0199 6600 2020 4299 6210 6626 
+3469
+Protocolo de Autorização:
+1512500072896288 - 03/07/2025 16:23:51
+
+============================================================
+
+NOME E ENDEREÇO
+----------------------------------------
+TIPO: TEXTO
+BOM FUTURO AGRICOLA LTDA
+EST ESTRADA RURAL, 0 - MT 249, KM 104, CGH CORRENTAO - 78435000
+
+============================================================
+
+CÓDIGO DO CLIENTE
+----------------------------------------
+TIPO: TEXTO
+6/2703074-1
+
+============================================================
+
+REFERÊNCIA E TOTAL A PAGAR
+----------------------------------------
+TIPO: TEXTO
+Julho / 2025
+16/08/2025
+R$ 55.299,80
+
+============================================================
+
+ITENS DA FATURA
+----------------------------------------
+TIPO: TABELA
+Texto original:
+PIS/
+Base Calc.
+ICMS
+% Alíq.
+Unid.
+Quant.
+com tributos
+Preço unit (R$)
+Valor (R$)
+0,533220
+ICMS (R$)
+0,533220
+0,388250
+41,999340
+41,999340
+83,998680
+18,356040
+93,60
+49,91
+-49,91
+33,54
+3.023,95
+453,59
+3.527,94
+0,00
+0,00
+-8,48
+5,70
+514,07
+77,11
+599,75
+0,00
+0,00
+ICMS
+(R$)
+unit R$
+Tarifa
+0,415670
+0,415670
+0,302660
+32,740000
+32,740000
+65,480000
+17,240000
+8,48
+COFINS (R$)
+49,91
+2,52
+-49,91
+-2,52
+33,54
+1,69
+3.023,95
+152,60
+453,59
+22,89
+3.527,94
+178,04
+48.239,69
+2.932,97
+21,09
+0,00
+Itens da Fatura
+Consumo em kWh - Fora Ponta
+Energia Atv Injetada GDI - Fora Ponta
+Energia Reativa Exced em KWh - Fponta
+Demanda de Potência Medida - Fora Ponta
+Demanda Potência Reativa Exced - F Ponta
+Demanda Potência Ativa - Ultrap - F Ponta
+Demanda de Geração TUSDG
+ LANÇAMENTOS E SERVIÇOS
+Contrib de Ilum Pub
+93,60
+86,40
+72,00
+10,80
+42,00
+2.628,00
+KWH
+KWH
+UN
+KW
+KW
+KW
+KW
+17
+17
+17
+17
+17
+17
+0
+0
+
+Tabela processada:
+Itens da Fatura | Unid. | Quant. | Preço unit (R$) com tributos | Valor (R$) | PIS/COFINS (R$) | Base Calc. % Aliq. ICMS (R$) | ICMS (R$) | Tarifa unit R$
+--------------------------------------------------------------------------------
+
+============================================================
+
+TRIBUTOS
+----------------------------------------
+TIPO: TABELA
+Texto original:
+(R$)
+(%)
+Cálc.(R$)
+586,52
+2.701,67
+1,0845
+4,9955
+17,00
+54.082,06
+54.082,06
+7.039,02
+1.196,63
+PIS
+ICMS
+COFINS
+
+Tabela processada:
+COFINS
+--------------------------------------------------------------------------------
+586,52
+2.701,67
+1,0845
+4,9955
+17,00
+54.082,06
+54.082,06
+7.039,02
+1.196,63
+
+============================================================
+

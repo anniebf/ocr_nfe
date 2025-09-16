@@ -83,7 +83,7 @@ for arquivo in os.listdir(PASTA_PDFS):
             print(f"Erro ao processar {arquivo}: {e}")
 
 # Salva em JSON final
-with open("../../APRENDIZADO/tests/resultados_comprovantes.json", "w", encoding="utf-8") as f:
+with open("../../../APRENDIZADO/tests/resultados_comprovantes.json", "w", encoding="utf-8") as f:
     json.dump(resultados, f, ensure_ascii=False, indent=4)
 
 print("Processamento concluído! Arquivo 'resultados_comprovantes.json' gerado.")

@@ -6,8 +6,8 @@ __pycache__/
 APRENDIZADO/
 src_moreno/
 logs/
-src/resource/pdf/
-src/resource/bkp pdfs
+src/resource/
+src/resource/*
 
 # Caches
 *.cache

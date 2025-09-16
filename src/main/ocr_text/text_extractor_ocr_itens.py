@@ -134,7 +134,7 @@ def processar_texto(texto):
         # Energia Injetada
         elif 'Injetada' in linha_limpa:
             partes = linha_limpa.split()
-            print(partes)
+            #print(partes)
             try:
                 #Cria uma lista de indices onde a palavra "Injetada" aparece na linha
                 idx_injetada = [i for i, p in enumerate(partes) if 'KwWH' in p or 'KWH' in p]
@@ -165,7 +165,7 @@ def processar_texto(texto):
                     else:
                         # Fallback: filtra todos os valores numéricos (abordagem original)
                         valores_filtrados = [v for v in valores if re.search(r'^[-]?\d+[.,]?\d*[.,]?\d*$', v)]
-                    print(valores_filtrados)
+                    #print(valores_filtrados)
                     if len(valores_filtrados) >= 3:
                         #Filtra somente o Valor da energia no indice 2 (coluna Valor)
                         valores_filtrados = [valores_filtrados[2]]

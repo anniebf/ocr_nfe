@@ -1,17 +1,18 @@
+
 import pdfplumber
-import numpy as np
 import re
 import json
+import os
 
 
-""" -PASSO A PASSO-
- - Recorta o pdf apenas na parte que nao é da cor branca
- - Leitura da parte seleceionada
- - Regex procura as palavras chaves
- - Retorna o json
- 
-"""
+# Configurar caminho do Tesseract no Windows
+##
+##USANDO PDFPLUMBER PARA LER OS PDFS
+##
 
+##O cabeçalho funciona para pegar as informacacoes dos refaturados
+##
+##
 
 def corrigir_caracteres_duplicados(texto):
     """
@@ -41,7 +42,6 @@ def corrigir_caracteres_duplicados(texto):
     return ' '.join(palavras_corrigidas)
 
 
-
 def extrair_dados_texto(texto):
     """
     Função para extrair todos os dados do texto usando regex
@@ -68,11 +68,11 @@ def extrair_dados_texto(texto):
     resultado['cnpj_distribuidora_energia'] = m.group(1) if m else None
 
     # 4️⃣ Número da nota fiscal
-    m = re.search(r'NOTA FISCAL N[°º]\s*([\d\.]+)', texto)
+    m = re.search(r'NOTA FISCAL Nº:\s*([\d\.]+)', texto)
     resultado['numero_nota_fiscal'] = m.group(1).replace('.', '') if m else None
 
     # 5️⃣ Série da nota fiscal
-    m = re.search(r'SÉRIE\s*[:]\s*(\d+)', texto)
+    m = re.search(r'Série:\s*(\d+)', texto)
     resultado['serie_nota_fiscal'] = m.group(1) if m else None
 
     # 6️⃣ Código do cliente
@@ -80,11 +80,11 @@ def extrair_dados_texto(texto):
     # resultado['codigo_cliente'] = m.group(1) if m else None
 
     # 7️⃣ Data de emissão
-    m = re.search(r'DATA EMISSÂO/APRESENTAÇÂO:[:\s]*(\d{2}/\d{2}/\d{4})', texto)
+    m = re.search(r'DATA DE EMISSÃO[:\s]*(\d{2}/\d{2}/\d{4})', texto)
     resultado['data_emissao'] = m.group(1) if m else None
 
     # 8️⃣ Chave de acesso
-    m = re.search(r'Chave de Acesso\s*\n([\d\s]+)', texto, re.IGNORECASE)
+    m = re.search(r'chave de acesso:\s*([\d\s]+)', texto, re.IGNORECASE)
     if m:
         chave = re.sub(r'\D', '', m.group(1))  # remove tudo que não é dígito
         resultado['chave_acesso'] = chave
@@ -95,24 +95,17 @@ def extrair_dados_texto(texto):
     valores = re.findall(r'\d{1,3}(?:\.\d{3})*,\d{2}', texto)
     resultado['preco_total'] = valores[-1] if valores else None
 
+    # 🔟 Ligação
+    m = re.search(r'LIGAÇÃO:\s*([^\n]+)', texto, re.IGNORECASE)
+    resultado['ligacao'] = m.group(1).strip() if m else None
+
     # 12️⃣ Disp
-    m = re.search(r'DISP.:\s*(\d+)', texto, re.IGNORECASE)
+    m = re.search(r'DISP:\s*(\d+)', texto, re.IGNORECASE)
     resultado['disp'] = m.group(1) if m else None
 
-
-
     # 13️⃣ Número do cliente (antes de "NOTA FISCAL Nº")
-    matches = re.findall(r'\b\d/\d{6}-\d\b', texto)
-
-    if not matches:
-        # Tentativa alternativa: procurar números antes de "- RURAL"
-        matches = re.findall(r'\b(\d+/\d+-\d+)\b\s', texto, re.IGNORECASE)
-        print(matches)
-
-    numero_cliente = matches[1] if matches else None
-    resultado['numero_cliente'] = numero_cliente
-
-
+    m = re.search(r'(\d+/[\d-]+)\s*NOTA FISCAL Nº:', texto)
+    resultado['numero_cliente'] = m.group(1) if m else None
 
     m = re.search(r'Classificação:\s*([^\n]+)', texto)
     classificacao = m.group(1).strip() if m else None
@@ -131,76 +124,51 @@ def extrair_dados_texto(texto):
         "classe": classe
     }
 
-    consumo_match = re.search(r'Consumo.*?kWh\s+([\d.,]+)\s+([\d.,]+)\s+([\d.,]+)', texto, re.IGNORECASE)
-    if consumo_match:
-        resultado['Consumo'] = {
-            'descricao': 'Consumo em kWh',
-            'valores': consumo_match.group(3)
-        }
-
-    bandeiras = re.finditer(r'Adic\. B\. Vermelha.*?([\d.,]+)', texto, re.IGNORECASE)
-
-    for i, match in enumerate(bandeiras, 1):
-        valor = match.group(1)
-
-        chave = f'Bandeira_Vermelha_{i}'
-        resultado[chave] = {
-            'descricao': 'Adic. B. Vermelha',
-            'valores': valor
-        }
-
     return resultado
 
 
-def bbox_colorido(page, branco_threshold=250):
-    """
-    Retorna a menor caixa (bbox) contendo qualquer pixel não branco/colorido.
-    branco_threshold: valor acima do qual é considerado branco (0-255)
-    """
-    # Gerar imagem da página
-    im = page.to_image(resolution=150).original.convert("RGB")
-    arr = np.array(im)
+# Definir a pasta onde estão os PDFs
+PASTA_PDFS = r"C:\bf_ocr\src\resource\pdf"
 
-    # Criar máscara de pixels coloridos (não brancos)
-    mask = np.any(arr < branco_threshold, axis=2)  # True se R/G/B < threshold
+# Processar cada arquivo PDF na pasta
+for arquivo in os.listdir(PASTA_PDFS):
+    # Pega todos os arquivos que tenham a extensao pdf
+    if arquivo.lower().endswith(".pdf"):
+        caminho_pdf = os.path.join(PASTA_PDFS, arquivo)
+        print(f"🔍 Processando: {arquivo}")
+        print("-" * 50)
 
-    coords = np.argwhere(mask)
-    if coords.size == 0:
-        return None  # nada colorido na página
+        try:
+            with pdfplumber.open(caminho_pdf) as pdf:
+                page = pdf.pages[0]
 
-    # Obter limites
-    top, left = coords.min(axis=0)
-    bottom, right = coords.max(axis=0)
+                # palavras-chave que identificam o cabeçalho
+                keywords = ["Preço", "unit", "R$"]
 
-    # Converter coordenadas da imagem para coordenadas do PDF
-    # page.height / imagem altura, page.width / imagem largura
-    img_height, img_width = arr.shape[:2]
-    x0 = left * page.width / img_width
-    x1 = right * page.width / img_width
-    y0 = top * page.height / img_height
-    y1 = bottom * page.height / img_height
+                y_positions = []
 
-    return (x0, y0, x1, y1)
+                for word in page.extract_words(x_tolerance=2, y_tolerance=2):
+                    if any(k in word["text"] for k in keywords):
+                        y_positions.append(word["top"])
 
-# --- Uso ---
-with pdfplumber.open(r"C:\bf_ocr\src\resource\pdf_fino\EMP 16 FL 1008081 - 4668543 -NOTA FISCAL Nº 044.606.418 - Série 001 OK.pdf") as pdf:
-    page = pdf.pages[0]
+                if y_positions:
+                    y_corte = min(y_positions)  # pegar a linha mais acima
+                    largura = page.width
+                    cropped = page.crop((0, 0, largura, y_corte))
+                    texto_filtrado = cropped.extract_text(x_tolerance=2, y_tolerance=2)
+                    texto = texto_filtrado or ""
 
-    bbox = bbox_colorido(page)
-    if bbox:
-        print("PAGINA RECORTADA - ", bbox)
-        recorte = page.crop(bbox)
-        texto = recorte.extract_text()
-        print("Texto extraído:")
-        #print(texto)
+                    #print(texto)
+                    # Chama a função única para extrair todos os dados
+                    resultado = extrair_dados_texto(texto)
 
-        resultado = extrair_dados_texto(texto)
-        print(json.dumps(resultado, indent=4, ensure_ascii=False))
-        print("\n" + "=" * 80 + "\n")
+                    # ---------- resultado final ----------
+                    print(json.dumps(resultado, indent=4, ensure_ascii=False))
+                    print("\n" + "=" * 80 + "\n")
 
-        # Visualizar
-        im_vis = page.to_image(resolution=150)
-        im_vis.draw_rect(bbox, stroke="red", stroke_width=3)
-        #im_vis.show()
-    else:
-        print("Página sem conteúdo colorido.")
+                else:
+                    print("⚠️ Nenhuma palavra-chave encontrada!")
+
+        except Exception as e:
+            print(f"❌ Erro ao processar {arquivo}: {str(e)}")
+            print("\n" + "=" * 80 + "\n")

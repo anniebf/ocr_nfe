@@ -35,19 +35,17 @@ Este projeto tem como objetivo **extrair de forma automatizada informações de 
 
 - **iNTEGRACAO COM O BANCO PARA INSERÇÃO DOS INFROMACOES**
 - ** **
-image-extractor/
-│
+
+
 ├─ src/
 │ ├─ main/
-│ │ ├─ text_extractor_ocr_cabecalho.py # Extrai informações do cabeçalho da fatura
-│ │ ├─ text_extractor_ocr_itens.py # Extrai apenas os valores monetários dos itens
-│ │ └─ text_extractor_ocr_itens_atributos.py # Extrai atributos detalhados e colunas dos itens
+│ │ ├─ text_extractor_ocr_cabecalho.py      # Extrai cabeçalho da fatura
+│ │ ├─ text_extractor_ocr_itens.py          # Extrai valores monetários
+│ │ ├─ text_extractor_ocr_itens_atributos.py # Extrai atributos (ICMS, PIS, etc.)
+│ │ └─ __init__.py                          # Tornar a pasta um módulo Python
 │ │
-│ └─ resource/
-│ └─ pdf/ # PDFs de exemplo para testes
-│
-├─ requirements.txt # Dependências do projeto
-└─ README.md
+│ ├─ resource/
+│ │ ├─ pdf/   
 
 ## Estrutura do Projeto
 

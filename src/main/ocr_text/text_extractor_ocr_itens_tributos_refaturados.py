@@ -122,13 +122,13 @@ for arquivo in os.listdir(PASTA_PDFS):
                 if t:
                     texto_completo += t + "\n"
 
-            print("Texto completo extraído:")
-            print(texto_completo[:1000] + "..." if len(texto_completo) > 1000 else texto_completo)
-            print("\n" + "=" * 80)
+            #print("Texto completo extraído:")
+            #print(texto_completo[:1000] + "..." if len(texto_completo) > 1000 else texto_completo)
+            #print("\n" + "=" * 80)
 
             secao_tributos = extrair_secao_tributos(texto_completo)
-            print(f"\n✅ SEÇÃO DE TRIBUTOS EXTRAÍDA:")
-            print(f"Conteúdo: {secao_tributos}")
+            #print(f"\n✅ SEÇÃO DE TRIBUTOS EXTRAÍDA:")
+            #print(f"Conteúdo: {secao_tributos}")
 
             resultado = processar_texto(secao_tributos)
 
