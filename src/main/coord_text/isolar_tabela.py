@@ -10,6 +10,10 @@ from pytesseract import Output
 import os
 import tabula  # Import correto para tabula
 
+'''
+CODIGO FALHO PARA PEGAR TABELA EM CSV
+'''
+
 
 def extract_high_quality_table(pdf_path, coordinates, page_number=0, dpi=300):
     """
@@ -41,6 +45,7 @@ def extract_high_quality_table(pdf_path, coordinates, page_number=0, dpi=300):
 
         # Usar Tesseract OCR
         custom_config = r'--oem 3 --psm 6'
+        pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
         ocr_data = pytesseract.image_to_data(processed_img, config=custom_config, output_type=Output.DICT, lang='por')
 
         # Processar resultados do OCR

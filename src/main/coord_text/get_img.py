@@ -2,13 +2,18 @@ import fitz  # PyMuPDF
 from PIL import Image
 import os
 
+
+"""
+ESSE CODIGO PEGAS AS COORDENADAS E FAZ UMPRINT E RETRNA UM PNG NA PASTA IMAGENS_RETORNADAS PARA CONFIRMACAO 
+"""
+
 # CONFIGURAÇÃO: Altere este caminho para o seu arquivo PDF
-CAMINHO_PDF = r"C:\bf_ocr\src\resource\pdf\EMP 16 FL 1001001-2703074-NOTA FISCAL Nº 020.429.962 - Série 002 - OK.pdf"
+CAMINHO_PDF = r"C:\bf_ocr\src\resource\pdf_refaturado\EMP 16 FL 1108005-4931235-NOTA FISCAL Nº 021.694.161 - Série 002.pdf"
 PASTA_SAIDA = r"C:\bf_ocr\src\main\coord_text\imagens_retornadas"
 
 # Definir as regiões a serem extraídas
 regioes = {
-    "mais_a_cima": {
+     "mais_a_cima": {
         "coordenadas": [(139.9, 4.1), (142.6, 46.2), (465.8, 42.1), (461.7, 6.8)],
         "descricao": "Área mais acima do documento"
     },
@@ -32,16 +37,18 @@ regioes = {
         "coordenadas": [(44.8, 260.7), (46.2, 285.2), (320.5, 282.5), (325.9, 252.6)],
         "descricao": "Referência e total a pagar"
     },
+    
     "itens_fatura": {
-        "coordenadas": [(445.4, 347.7), (445.4, 450.9), (32.6, 457.7), (25.8, 358.5)],
+        "coordenadas": [(21.7, 346.2), (434.4, 340.7), (433.1, 439.8), (23.1, 443.9)],
         "descricao": "Itens da fatura"
     },
-    "tributos": {
+     "tributos": {
         "coordenadas": [(444.1, 376.2), (563.6, 374.8), (445.4, 407.4), (566.3, 406.1)],
         "descricao": "Tributos"
     }
-}
 
+}
+#(21.7, 346.2), (434.4, 340.7), (433.1, 439.8), (23.1, 443.9)  cordenadas dos itens do refaturados
 
 def calcular_retangulo_regiao(coordenadas):
     """

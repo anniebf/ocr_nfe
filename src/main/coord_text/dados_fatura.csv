@@ -1,0 +1,9 @@
+descricao;quant;proço unit com tributos;valor;pis/confins;base calc icms;porcent icms;icms;tarifa unit
+Consumo em kWh;93,60;0,533220;49,91;2,52;49,91;17;8,48;0,415670
+Energia Atv Injetada GDI - Fora Ponta KWH;93,60;0,533220;-49,91;-2,52;-49,91;17;-8,48;0,415670
+Energia Reativa Exced em KWh;86,40;0,388250;33,54;1,69;33,54;17;5,70;0,302660
+Demanda de Potência Medida - Fora Ponta KW;72,00;41,999340;3.023,95;152,60;3.023,95;17;514,07;32,740000
+Demanda Potência Reativa Exced - F Ponta KW;10,80;41,999340;453,59;22,89;453,59;17;77,11;32,740000
+Demanda Potência Ativa - Ultrap - F Ponta KW;42,00;83,998680;3.527,94;178,04;3.527,94;17;599,75;65,480000
+Demanda de Geração TUSDG KW;2.628,00;18,356040;48.239,69;2.932,97;0,00;0;0,00;17,240000
+Ilum Pub

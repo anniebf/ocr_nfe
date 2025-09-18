@@ -2,7 +2,7 @@ import fitz  # PyMuPDF
 import os
 
 # CONFIGURAÇÃO
-CAMINHO_PDF = r"C:\bf_ocr\src\resource\pdf\EMP 16 FL 1001001-2703074-NOTA FISCAL Nº 020.429.962 - Série 002 - OK.pdf"
+CAMINHO_PDF = r"C:\bf_ocr\src\resource\pdf\EMP 22 FL 8B01001-2789122-NOTA FISCAL Nº 020.663.927 - Série 002 ok.pdf"
 
 # Regiões a serem extraídas
 regioes = {
@@ -17,11 +17,9 @@ regioes = {
     "codigo_cliente": {"coordenadas": [(236.3, 182.0), (237.7, 213.2), (331.4, 211.9), (334.1, 184.7)],
                        "descricao": "Código do cliente"},
     "ref_total_pagar": {"coordenadas": [(44.8, 260.7), (46.2, 285.2), (320.5, 282.5), (325.9, 252.6)],
-                        "descricao": "Referência e total a pagar"},
-    "itens_fatura": {"coordenadas": [(445.4, 347.7), (445.4, 450.9), (32.6, 457.7), (25.8, 358.5)],
-                     "descricao": "Itens da fatura"},
-    "tributos": {"coordenadas": [(444.1, 376.2), (563.6, 374.8), (445.4, 407.4), (566.3, 406.1)],
-                 "descricao": "Tributos"},
+                        "descricao": "Referência e total a pagar"}
+    #"tributos": {"coordenadas": [(444.1, 376.2), (563.6, 374.8), (445.4, 407.4), (566.3, 406.1)],
+    #             "descricao": "Tributos"},
 }
 
 
