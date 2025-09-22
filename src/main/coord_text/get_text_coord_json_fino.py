@@ -450,9 +450,9 @@ def processar_codigo_cliente(texto: str) -> Dict[str, Any]:
     """Processa código do cliente"""
     linhas = texto.split('\n')
     resultado = {}
-
+    #print(linhas)
     if len(linhas) >= 1:
-        codigo_completo = re.search(r'[\d/]+', linhas[0])
+        codigo_completo = re.search(r'[\d/]+-?\d*', linhas[0])
         if codigo_completo:
             resultado["codigo_cliente"] = codigo_completo.group()
         else:

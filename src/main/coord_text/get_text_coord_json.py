@@ -229,62 +229,86 @@ def processar_area_mais_acima(texto: str) -> Dict[str, Any]:
 
 def processar_roteiro_tensao(texto: str) -> Dict[str, Any]:
     """Processa roteiro e tensão"""
-    linhas = texto.split('\n')
+    linhas = [linha.strip() for linha in texto.split('\n') if linha.strip()]
     resultado = {}
 
     if len(linhas) >= 1:
-        # Pega somente os números do roteiro
-        roteiro_numeros = re.search(r'\b\d+\b', linhas[0])
-        if roteiro_numeros:
-            resultado["roteiro"] = roteiro_numeros.group()
+        # Extrai roteiro completo (mantém números e hífens)
+        roteiro_match = re.search(r'ROTEIRO:\s*([\d\s\-]+)', linhas[0], re.IGNORECASE)
+        if roteiro_match:
+            resultado["roteiro"] = roteiro_match.group(1).strip()
         else:
-            resultado["roteiro"] = linhas[0].strip()
+            # Fallback: pega apenas números se não encontrar "ROTEIRO:"
+            roteiro_numeros = re.search(r'\b\d+\b', linhas[0])
+            if roteiro_numeros:
+                resultado["roteiro"] = roteiro_numeros.group()
+            else:
+                resultado["roteiro"] = linhas[0]
 
     if len(linhas) >= 2:
-        # Extrai matrícula (normalmente números)
-        matricula_match = re.search(r'\b\d+\b', linhas[1])
+        # Extrai matrícula completa
+        matricula_match = re.search(r'MATRÍCULA:\s*([\d\-]+)', linhas[1], re.IGNORECASE)
         if matricula_match:
-            resultado["matricula"] = matricula_match.group()
+            resultado["matricula"] = matricula_match.group(1).strip()
+        else:
+            # Fallback: pega apenas números
+            matricula_match = re.search(r'\b\d+\b', linhas[1])
+            if matricula_match:
+                resultado["matricula"] = matricula_match.group()
 
     if len(linhas) >= 4:
         classificacao = []
         for i in range(3, min(6, len(linhas))):  # linhas 4, 5 e 6 (índices 3, 4, 5)
             if i < len(linhas):
-                classificacao.append(linhas[i].strip())
+                classificacao.append(linhas[i])
         texto_classificacao = ' '.join(classificacao)
 
         # Extrai informações específicas da classificação
         info_classificacao = {}
 
-        # Extrai ligação (palavra após "LIGAÇÃO:")
-        ligacao_match = re.search(r'LIGAÇÃO:\s*([^/]+)', texto_classificacao, re.IGNORECASE)
+        # Extrai ligação (procura por TRIFASICO, MONOFASICO, BIFASICO)
+        ligacao_match = re.search(r'(TRIFASICO|MONOFASICO|BIFASICO)', texto_classificacao, re.IGNORECASE)
         if ligacao_match:
-            info_classificacao["ligacao"] = ligacao_match.group(1).strip()
+            info_classificacao["ligacao"] = ligacao_match.group(1).upper()
+        else:
+            # Fallback: procura após "LIGAÇÃO:"
+            ligacao_match = re.search(r'LIGAÇÃO:\s*([^/]+)', texto_classificacao, re.IGNORECASE)
+            if ligacao_match:
+                info_classificacao["ligacao"] = ligacao_match.group(1).strip()
 
-        # Extrai grupo (primeira letra após o primeiro /)
-        grupo_match = re.search(r'/\s*([A-Za-z])', texto_classificacao)
-        if grupo_match:
-            info_classificacao["grupo"] = grupo_match.group(1)
+        # Extrai grupo e subgrupo (B1, B2, B3, A1, etc.)
+        grupo_subgrupo_match = re.search(r'/\s*([A-Z])(\d*)', texto_classificacao)
+        if grupo_subgrupo_match:
+            info_classificacao["grupo"] = grupo_subgrupo_match.group(1)
+            if grupo_subgrupo_match.group(2):  # Se tem número
+                info_classificacao["subgrupo"] = f"{grupo_subgrupo_match.group(1)}{grupo_subgrupo_match.group(2)}"
+            else:
+                info_classificacao["subgrupo"] = grupo_subgrupo_match.group(1)
 
-        # Extrai subgrupo (3 caracteres após o /)
-        subgrupo_match = re.search(r'/\s*([A-Za-z0-9]{3})', texto_classificacao)
-        if subgrupo_match:
-            info_classificacao["subgrupo"] = subgrupo_match.group(1)
-
-        # Extrai classe (palavra após o grupo)
+        # Extrai classe (texto entre o subgrupo e a próxima barra ou fim)
         if 'subgrupo' in info_classificacao:
-            classe_match = re.search(rf'{info_classificacao["subgrupo"]}\s+([^/]+)', texto_classificacao)
-            if classe_match:
-                info_classificacao["classe"] = classe_match.group(1).strip()
+            # Procura o subgrupo seguido de texto até a próxima barra
+            padrao_classe = re.search(
+                rf'{info_classificacao["subgrupo"]}\s+([^/]+)',
+                texto_classificacao,
+                re.IGNORECASE
+            )
+            if padrao_classe:
+                classe = padrao_classe.group(1).strip()
+                # Remove possíveis barras no final
+                classe = re.sub(r'/\s*$', '', classe).strip()
+                info_classificacao["classe"] = classe
 
         resultado["classificacao"] = info_classificacao
 
-    if len(linhas) >= 7:
-        disp_match = re.search(r'DISP\s*[:]?\s*(\d+)', linhas[6], re.IGNORECASE)
+    # Procura DISP em qualquer linha (não apenas na linha 7)
+    for linha in linhas:
+        disp_match = re.search(r'DISP\s*[:]?\s*(\d+)', linha, re.IGNORECASE)
         if disp_match:
             resultado["disp"] = disp_match.group(1)
-        else:
-            resultado["disp"] = ""
+            break
+    else:
+        resultado["disp"] = ""
 
     return resultado
 
@@ -337,7 +361,7 @@ def processar_codigo_cliente(texto: str) -> Dict[str, Any]:
     resultado = {}
 
     if len(linhas) >= 1:
-        codigo_completo = re.search(r'[\d/]+', linhas[0])
+        codigo_completo = re.search(r'[\d/]+-?\d*', linhas[0])
         if codigo_completo:
             resultado["codigo_cliente"] = codigo_completo.group()
         else:
