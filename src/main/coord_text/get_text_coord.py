@@ -8,10 +8,8 @@ CAMINHO_PDF = r"C:\bf_ocr\src\resource\pdf\EMP 16 FL 1001001-2703074-NOTA FISCAL
 regioes = {
     "mais_a_cima": {"coordenadas": [(139.9, 4.1), (142.6, 46.2), (465.8, 42.1), (461.7, 6.8)],
                     "descricao": "Área mais acima"},
-
     "roteiro_tensao": {"coordenadas": [(43.5, 81.5), (40.7, 157.5), (319.1, 150.7), (306.9, 84.2)],
                        "descricao": "Roteiro e tensão"},
-
     "nota_fiscal_protocolo": {"coordenadas": [(422.4, 196.9), (423.7, 282.5), (559.5, 279.8), (559.5, 202.4)],
                               "descricao": "Nota fiscal e protocolo"},
     "nome_endereco": {"coordenadas": [(47.5, 158.9), (40.7, 243.1), (236.3, 160.3), (233.6, 244.5)],

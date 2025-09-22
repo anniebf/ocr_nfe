@@ -13,7 +13,7 @@ ESSE CODIGO ABRE UM PDF QUE ME PERMITE PEGAR AS COORDENADAS DELE
 
 
 # CONFIGURAÇÃO: Altere este caminho para o seu arquivo PDF
-CAMINHO_PDF =  r"C:\bf_ocr\src\resource\pdf\EMP 16 FL 1001001-2703074-NOTA FISCAL Nº 020.429.962 - Série 002 - OK.pdf"
+CAMINHO_PDF =  r"C:\bf_ocr\src\resource\pdf_fino\EMP 16 FL 1008081 - 4668543 -NOTA FISCAL Nº 044.606.418 - Série 001 OK.pdf"
 
 
 def mostrar_pdf_com_coordenadas(pdf_path):
@@ -45,7 +45,8 @@ def mostrar_pdf_com_coordenadas(pdf_path):
         scale_y = max_height / pdf_height
         scale = min(scale_x, scale_y)
 
-        # Renderizar a página como uma imagem PNG com escala proporcional
+        # Ajustar manualmente o scale como float
+        scale = float(scale) * 1.7
         mat = fitz.Matrix(scale, scale)
         pix = page.get_pixmap(matrix=mat)
 
