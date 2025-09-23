@@ -46,3 +46,4 @@ src_moreno/controller/__pycache__/
 src_moreno/service/__pycache__/
 src_moreno/utils/__pycache__/
 
+src/main/coord_text/text_json/database

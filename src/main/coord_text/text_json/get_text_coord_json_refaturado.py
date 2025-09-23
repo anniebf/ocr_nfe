@@ -1,22 +1,22 @@
 import pdfplumber
-import os
 import re
 import json
 import pandas as pd
 from typing import Dict, Any, List, Tuple
 from pathlib import Path
-
+import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor
 # CONFIGURAÇÃO
-PASTA_PDFS = r"C:\bf_ocr\src\resource\pdf"
-ARQUIVO_EXCEL_SAIDA = r"C:\bf_ocr\src\resource\pdf\faturas_processadas_botzin.xlsx"
+PASTA_PDFS = r"C:\bf_ocr\src\resource\pdf_refaturado"
+ARQUIVO_EXCEL_SAIDA = r"C:\bf_ocr\src\resource\pdf_refaturado\faturas_processadas_botzin.xlsx"
 
 # Regiões a serem extraídas
 regioes = {
-    "mais_a_cima": {"coordenadas": [(139.9, 4.1), (142.6, 46.2), (465.8, 42.1), (461.7, 6.8)],
+    "mais_a_cima": {"coordenadas": [(145.3, 4.1), (146.6, 54.3), (464.3, 54.3), (462.9, 6.8)],
                     "descricao": "Área mais acima"},
     "roteiro_tensao": {"coordenadas": [(43.5, 81.5), (40.7, 157.5), (319.1, 150.7), (306.9, 84.2)],
                        "descricao": "Roteiro e tensão"},
-    "nota_fiscal_protocolo": {"coordenadas": [(422.4, 196.9), (423.7, 282.5), (559.5, 279.8), (559.5, 202.4)],
+    "nota_fiscal_protocolo": {"coordenadas": [(419.5, 190.1), (418.1, 270.2), (552.5, 271.5), (549.8, 188.7)],
                               "descricao": "Nota fiscal e protocolo"},
     "nome_endereco": {"coordenadas": [(42.1, 160.3), (44.8, 201.0), (232.2, 196.9), (229.5, 163.0)],
                       "descricao": "Nome e endereço"},
@@ -24,11 +24,14 @@ regioes = {
                        "descricao": "Código do cliente"},
     "ref_total_pagar": {"coordenadas": [(44.8, 260.7), (46.2, 285.2), (320.5, 282.5), (325.9, 252.6)],
                         "descricao": "Referência e total a pagar"},
-    "tributos": {"coordenadas": [(444.1, 376.2), (563.6, 374.8), (445.4, 407.4), (566.3, 406.1)],
+    "tributos": {"coordenadas": [(434.4, 338.0), (556.6, 332.6), (434.4, 391.0), (559.3, 388.3)],
                  "descricao": "Tributos"},
-    "tabela_itens": {"coordenadas": [(21.7, 361.2), (444.1, 571.7)],
-                     "descricao": "Tabela de itens da fatura"}
+    "tabela_itens": {"coordenadas": [(16.3, 334.0), (437.1, 545.7)],
+                     "descricao": "Tabela de itens da fatura"},
+    "cnpj": {"coordenadas": [(47.1, 212.4), (148.5, 226.0), (47.1, 227.6), (146.1, 216.4)],
+                 "descricao": "cnpj"}
 }
+
 
 
 def calcular_retangulo(coordenadas):
@@ -41,7 +44,7 @@ def calcular_retangulo(coordenadas):
         return (min(x_coords), min(y_coords), max(x_coords), max(y_coords))
 
 
-def extrair_texto_com_layout(pdf_path, retangulo):
+def extrair_texto_nas_coordenadas(pdf_path, retangulo):
     """Extrai texto mantendo informações de layout para melhor análise"""
     try:
         with pdfplumber.open(pdf_path) as pdf:
@@ -223,6 +226,29 @@ def processar_area_mais_acima(texto: str) -> Dict[str, Any]:
         cep_match = re.search(r'\b\d{5}-?\d{3}\b', linhas[3])
         if cep_match:
             resultado["cep"] = cep_match.group()
+
+    return resultado
+
+
+
+def processar_cnpj(texto: str, nome_titular="") -> dict:
+    resultado = {}
+    linhas = texto.split('\n')
+
+    num_cnpj = re.findall(r'\d', linhas[0])
+    ult_num = (num_cnpj[-3:])
+    prim_num = (num_cnpj[0])
+    ult_num = ''.join(ult_num)
+    #print(ult_num)
+
+    print(linhas[1])
+    num_insc = re.findall(r'\d+', linhas[1])
+    num_insc = ''.join(num_insc)
+
+    print(prim_num,ult_num,nome_titular,num_insc)
+    cnpj = retorno_cnpj_pdf(prim_num,ult_num,nome_titular,num_insc)
+
+    resultado = cnpj
 
     return resultado
 
@@ -429,42 +455,95 @@ def processar_tributos(texto: str) -> Dict[str, Any]:
     return resultado
 
 
+import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor
+
+
+def processar_regiao_parallel(nome, texto, resultado_parcial):
+    """Processa uma região individual em thread"""
+    try:
+        if nome == "mais_a_cima":
+            return "informacoes_superiores", processar_area_mais_acima(texto)
+        elif nome == "roteiro_tensao":
+            return "roteiro_tensao", processar_roteiro_tensao(texto)
+        elif nome == "nota_fiscal_protocolo":
+            return "nota_fiscal", processar_nota_fiscal_protocolo(texto)
+        elif nome == "nome_endereco":
+            return "cliente", processar_nome_endereco(texto)
+        elif nome == "codigo_cliente":
+            return "codigo_cliente", processar_codigo_cliente(texto)
+        elif nome == "ref_total_pagar":
+            return "pagamento", processar_ref_total_pagar(texto)
+        elif nome == "tributos":
+            return "tributos", processar_tributos(texto)
+        elif nome == "cnpj":
+            # CNPJ precisa esperar o cliente estar pronto
+            nome_titular = resultado_parcial.get('cliente', {}).get('nome_titular', '')
+            return "cnpj", processar_cnpj(texto, nome_titular)
+    except Exception as e:
+        return nome, {"erro": f"Erro no processamento: {str(e)}", "texto_bruto": texto}
+
+
 def extrair_informacoes_json(pdf_path: str) -> Dict[str, Any]:
-    """Extrai todas as informações e retorna como JSON"""
+    """Extrai todas as informações e retorna como JSON com threading"""
     resultado_final = {}
 
+    # Extrair todos os textos primeiro (fora das threads)
+    textos_regioes = {}
     for nome, info in regioes.items():
-        retangulo = calcular_retangulo(info["coordenadas"])
-
         if nome == "tabela_itens":
-            linhas = extrair_texto_por_linhas(pdf_path, info["coordenadas"])
-            resultado_final["itens_fatura"] = processar_tabela_itens(linhas, pdf_path)
-            continue
+            continue  # Tabela será processada separadamente
 
-        texto = extrair_texto_com_layout(pdf_path, retangulo)
+        retangulo = calcular_retangulo(info["coordenadas"])
+        texto = extrair_texto_nas_coordenadas(pdf_path, retangulo)
 
         if texto.startswith("Erro") or texto == "Nenhum texto encontrado":
             resultado_final[nome] = {"erro": texto}
-            continue
+        else:
+            textos_regioes[nome] = texto
 
+    # Processar regiões independentes em paralelo
+    regioes_independentes = ["mais_a_cima", "roteiro_tensao", "nota_fiscal_protocolo",
+                             "nome_endereco", "codigo_cliente", "ref_total_pagar", "tributos"]
+
+    # Dicionário temporário para resultados parciais (usado pelo CNPJ)
+    resultado_parcial = resultado_final.copy()
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        # Enviar todas as tarefas independentes para execução
+        future_to_regiao = {}
+
+        for nome in regioes_independentes:
+            if nome in textos_regioes:  # Só processa se tem texto válido
+                future = executor.submit(processar_regiao_parallel, nome, textos_regioes[nome], resultado_parcial)
+                future_to_regiao[future] = nome
+
+        # Coletar resultados conforme ficam prontos
+        for future in concurrent.futures.as_completed(future_to_regiao):
+            nome = future_to_regiao[future]
+            try:
+                chave, resultado = future.result()
+                resultado_final[chave] = resultado
+                resultado_parcial[chave] = resultado  # Atualiza parcial para o CNPJ
+            except Exception as e:
+                resultado_final[nome] = {"erro": str(e)}
+
+    # Processar CNPJ (depende do cliente)
+    if "cnpj" in textos_regioes and "cliente" in resultado_final:
         try:
-            if nome == "mais_a_cima":
-                resultado_final["informacoes_superiores"] = processar_area_mais_acima(texto)
-            elif nome == "roteiro_tensao":
-                resultado_final["roteiro_tensao"] = processar_roteiro_tensao(texto)
-            elif nome == "nota_fiscal_protocolo":
-                resultado_final["nota_fiscal"] = processar_nota_fiscal_protocolo(texto)
-            elif nome == "nome_endereco":
-                resultado_final["cliente"] = processar_nome_endereco(texto)
-            elif nome == "codigo_cliente":
-                resultado_final["codigo_cliente"] = processar_codigo_cliente(texto)
-            elif nome == "ref_total_pagar":
-                resultado_final["pagamento"] = processar_ref_total_pagar(texto)
-            elif nome == "tributos":
-                resultado_final["tributos"] = processar_tributos(texto)
-
+            nome_titular = resultado_final.get('cliente', {}).get('nome_titular', '')
+            resultado_final["cnpj"] = processar_cnpj(textos_regioes["cnpj"], nome_titular)
         except Exception as e:
-            resultado_final[nome] = {"erro": f"Erro no processamento: {str(e)}", "texto_bruto": texto}
+            resultado_final["cnpj"] = {"erro": f"Erro no processamento: {str(e)}",
+                                       "texto_bruto": textos_regioes["cnpj"]}
+
+    # PASSO 4: Processar tabela de itens (fora do threading por ser complexa)
+    if "tabela_itens" in regioes:
+        try:
+            linhas = extrair_texto_por_linhas(pdf_path, regioes["tabela_itens"]["coordenadas"])
+            resultado_final["itens_fatura"] = processar_tabela_itens(linhas, pdf_path)
+        except Exception as e:
+            resultado_final["itens_fatura"] = {"erro": f"Erro na tabela: {str(e)}"}
 
     return resultado_final
 
@@ -548,6 +627,8 @@ def main():
         dados_extraidos = extrair_informacoes_json(caminho_pdf)
 
         # Converte para JSON com formatação
+        nome_titular = dados_extraidos['cliente']['nome_titular']
+
         json_output = json.dumps(dados_extraidos, ensure_ascii=False, indent=2)
 
         print("DADOS EXTRAÍDOS (JSON):")

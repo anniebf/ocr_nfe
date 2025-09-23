@@ -8,7 +8,7 @@ ESSE CODIGO PEGAS AS COORDENADAS E FAZ UMPRINT E RETRNA UM PNG NA PASTA IMAGENS_
 """
 
 # CONFIGURAÇÃO: Altere este caminho para o seu arquivo PDF
-CAMINHO_PDF = r"C:\bf_ocr\src\resource\pdf_fino\EMP 16 FL 1008081 - 4668543 -NOTA FISCAL Nº 044.606.418 - Série 001 OK.pdf"
+CAMINHO_PDF = r"C:\bf_ocr\src\resource\pdf\EMP 16 FL 1001001-1730312-NOTA FISCAL Nº 020.841.128 - Série 002 - OK.pdf"
 PASTA_SAIDA = r"C:\bf_ocr\src\main\coord_text\imagens_retornadas"
 
 # Definir as regiões a serem extraídas

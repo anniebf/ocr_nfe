@@ -6,6 +6,12 @@ Este projeto tem como objetivo **extrair de forma automatizada informações de 
 
 ## Confguracoes do python 
 -Versão do python: 3.12
+-bibliotecas: requirements.txt
+
+## Como usar o codigo
+-git clone no projeto
+-pip install requiments.txt
+-python ./src/main/coord_text/get_all_coord_json.py #codigo que pega somente os pdf padroes 
 
 ## Funcionalidades
 
@@ -36,16 +42,17 @@ Este projeto tem como objetivo **extrair de forma automatizada informações de 
 - **iNTEGRACAO COM O BANCO PARA INSERÇÃO DOS INFROMACOES**
 - ** **
 
-
-├─ src/
-│ ├─ main/
-│ │ ├─ text_extractor_ocr_cabecalho.py      # Extrai cabeçalho da fatura
-│ │ ├─ text_extractor_ocr_itens.py          # Extrai valores monetários
-│ │ ├─ text_extractor_ocr_itens_atributos.py # Extrai atributos (ICMS, PIS, etc.)
-│ │ └─ __init__.py                          # Tornar a pasta um módulo Python
-│ │
-│ ├─ resource/
-│ │ ├─ pdf/   
-
 ## Estrutura do Projeto
+
+**├─ src/**
+**│ ├─ main/**
+**│ │ ├─ coord_text/ #codigos que pegam coordenadas especificas para extrair os textos**
+**│ │ ├─ api/ #codigo com api openia(nao usado)**
+**│ │ ├─ ocr_text/ #codigos que usam o pdf inteiro para extrair os textos**
+**│ │ └─ __init__.py**
+**│ │**
+**│ ├─ resource/**
+**│ │ ├─ pdf/**
+**│ │─ requirements.txt #bibliotecas usadas**
+
 
