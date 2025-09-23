@@ -1,10 +1,10 @@
 import pdfplumber
-import os
 import re
 import json
-import pandas as pd
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any
 from pathlib import Path
+import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor
 
 # CONFIGURAÇÃO
 PASTA_PDFS = r"C:\bf_ocr\src\resource\pdf_fino"
@@ -84,10 +84,10 @@ regioes = {
         "descricao": "Tributos"
     },
     "cnpj": {"coordenadas":
-                 [(49.7, 128.8),
-                  (93.8, 128.8),
-                  (50.8, 139.0),
-                  (93.8, 137.8)
+                 [(5.6, 690.3),
+                  (207.9, 698.3),
+                  (6.8, 700.5),
+                  (206.8, 689.2)
             ],
             "descricao": "cnpj"}
 }
@@ -106,7 +106,7 @@ def calcular_retangulo(coordenadas):
         return (min(x_coords), min(y_coords), max(x_coords), max(y_coords))
 
 
-def extrair_texto_com_layout(pdf_path, retangulo):
+def extrair_texto_nas_coordenadas(pdf_path, retangulo):
     """Extrai texto mantendo informações de layout para melhor análise"""
     try:
         with pdfplumber.open(pdf_path) as pdf:
@@ -157,9 +157,6 @@ def extrair_texto_por_linhas(pdf_path, coordenadas, pagina=0):
     except Exception as e:
         print(f"Erro ao processar {pdf_path}: {e}")
         return []
-
-
-AREA_DISP = (11.3, 67.8, 282.5, 82.5)
 
 
 def extrair_disp_especifico(pdf_path: str) -> str:
@@ -449,7 +446,13 @@ def processar_nome_endereco(texto: str) -> Dict[str, Any]:
         for i in range(1, min(4, len(linhas))):
             if i < len(linhas):
                 endereco.append(linhas[i].strip())
-        resultado["endereco"] = ' '.join(endereco)
+
+        endereco_completo = ' '.join(endereco)
+        resultado["endereco"] = endereco_completo
+
+        # 🔍 Agora procura o CEP no endereço completo
+        cep_match = re.search(r'CEP\s*(\d{5}-?\d{3})', endereco_completo)
+        resultado["CEP"] = cep_match.group(1) if cep_match else None
 
     return resultado
 
@@ -468,15 +471,18 @@ def processar_codigo_cliente(texto: str) -> Dict[str, Any]:
 
     return resultado
 
+
 def processar_cnpj(texto: str) -> dict:
     resultado = {}
     linhas = texto.split('\n')
-    numeros = re.findall(r'\d', linhas[0])
-    resultado["ult_num"] = (numeros[-3:])
-    resultado["prim_num"] = (numeros[0])
+    match = re.search(r'CNPJ/CPF:\s*([\d.-/]+)', texto)
+    if match:
+        # Remove caracteres especiais, mantém só números
+        numeros_limpos = re.sub(r'[^\d]', '', match.group(1))
 
 
-    return resultado
+    return numeros_limpos
+
 
 def processar_ref_total_pagar(texto: str) -> Dict[str, Any]:
     """Processa referência e total a pagar"""
@@ -537,47 +543,123 @@ def processar_tributos(texto: str) -> Dict[str, Any]:
     return resultado
 
 
+def processar_tributos(texto: str) -> Dict[str, Any]:
+    """Processa tributos"""
+    linhas = texto.split('\n')
+    resultado = {}
+
+    if len(linhas) >= 2:
+        pis_texto = ' '.join(linhas[0:2])
+        pis_valores = re.findall(r'[\d.,]+', pis_texto)
+        if len(pis_valores) >= 3:
+            resultado["PIS"] = {
+                "base_calculo": pis_valores[0],
+                "aliquota": pis_valores[1],
+                "valor": pis_valores[2]
+            }
+
+    if len(linhas) >= 3:
+        cofins_valores = re.findall(r'[\d.,]+', linhas[2])
+        if len(cofins_valores) >= 3:
+            resultado["COFINS"] = {
+                "base_calculo": cofins_valores[0],
+                "aliquota": cofins_valores[1],
+                "valor": cofins_valores[2]
+            }
+
+    if len(linhas) >= 4:
+        icms_valores = re.findall(r'[\d.,]+', linhas[3])
+        if len(icms_valores) >= 3:
+            resultado["ICMS"] = {
+                "base_calculo": icms_valores[0],
+                "aliquota": icms_valores[1],
+                "valor": icms_valores[2]
+            }
+
+    return resultado
+
+def processar_regiao_parallel(nome, texto, resultado_parcial):
+    """Processa uma região individual em thread"""
+    try:
+        if nome == "mais_a_cima":
+            return "informacoes_superiores", processar_area_mais_acima(texto)
+        elif nome == "roteiro_tensao":
+            return "roteiro_tensao", processar_roteiro_tensao(texto)
+        elif nome == "nota_fiscal_protocolo":
+            return "nota_fiscal", processar_nota_fiscal_protocolo(texto)
+        elif nome == "nome_endereco":
+            return "cliente", processar_nome_endereco(texto)
+        elif nome == "codigo_cliente":
+            return "codigo_cliente", processar_codigo_cliente(texto)
+        elif nome == "ref_total_pagar":
+            return "pagamento", processar_ref_total_pagar(texto)
+        elif nome == "tributos":
+            return "tributos", processar_tributos(texto)
+        elif nome == "cnpj":
+            # CNPJ precisa esperar o cliente estar pronto
+            cep = resultado_parcial.get('cliente', {}).get('CEP', '')
+            return "cnpj", processar_cnpj(texto, cep)
+    except Exception as e:
+        return nome, {"erro": f"Erro no processamento: {str(e)}", "texto_bruto": texto}
+
+
 def extrair_informacoes_json(pdf_path: str) -> Dict[str, Any]:
-    """Extrai todas as informações e retorna como JSON"""
+    """Extrai todas as informações e retorna como JSON com threading"""
     resultado_final = {}
 
+    # Extrair todos os textos primeiro (fora das threads)
+    textos_regioes = {}
     for nome, info in regioes.items():
-        retangulo = calcular_retangulo(info["coordenadas"])
-
         if nome == "tabela_itens":
-            linhas = extrair_texto_por_linhas(pdf_path, info["coordenadas"])
-            resultado_final["itens_fatura"] = processar_tabela_itens(linhas, pdf_path)
-            continue
+            continue  # Tabela será processada separadamente
 
-        texto = extrair_texto_com_layout(pdf_path, retangulo)
+        retangulo = calcular_retangulo(info["coordenadas"])
+        texto = extrair_texto_nas_coordenadas(pdf_path, retangulo)
 
         if texto.startswith("Erro") or texto == "Nenhum texto encontrado":
             resultado_final[nome] = {"erro": texto}
-            continue
+        else:
+            textos_regioes[nome] = texto
 
+    # Processar regiões independentes em paralelo
+    regioes_independentes = ["mais_a_cima", "roteiro_tensao", "nota_fiscal_protocolo",
+                             "nome_endereco", "codigo_cliente", "ref_total_pagar", "tributos"]
+
+    # Dicionário temporário para resultados parciais (usado pelo CNPJ)
+    resultado_parcial = resultado_final.copy()
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        # Enviar todas as tarefas independentes para execução
+        future_to_regiao = {}
+
+        for nome in regioes_independentes:
+            if nome in textos_regioes:  # Só processa se tem texto válido
+                future = executor.submit(processar_regiao_parallel, nome, textos_regioes[nome], resultado_parcial)
+                future_to_regiao[future] = nome
+
+        # Coletar resultados conforme ficam prontos
+        for future in concurrent.futures.as_completed(future_to_regiao):
+            nome = future_to_regiao[future]
+            try:
+                chave, resultado = future.result()
+                resultado_final[chave] = resultado
+                resultado_parcial[chave] = resultado  # Atualiza parcial para o CNPJ
+            except Exception as e:
+                resultado_final[nome] = {"erro": str(e)}
+
+    # Processar CNPJ (depende do cliente)
+    if "cnpj" in textos_regioes and "cliente" in resultado_final:
+        resultado_final["cnpj"] = processar_cnpj(textos_regioes["cnpj"])
+
+    # PASSO 4: Processar tabela de itens (fora do threading por ser complexa)
+    if "tabela_itens" in regioes:
         try:
-            if nome == "mais_a_cima":
-                resultado_final["informacoes_superiores"] = processar_area_mais_acima(texto)
-            elif nome == "roteiro_tensao":
-                resultado_final["roteiro_tensao"] = processar_roteiro_tensao(texto, pdf_path)
-            elif nome == "nota_fiscal_protocolo":
-                resultado_final["nota_fiscal"] = processar_nota_fiscal_protocolo(texto)
-            elif nome == "nome_endereco":
-                resultado_final["clente"] = processar_nome_endereco(texto)
-            elif nome == "codigo_cliente":
-                resultado_final["codigo_cliente"] = processar_codigo_cliente(texto)
-            elif nome == "ref_total_pagar":
-                resultado_final["pagamento"] = processar_ref_total_pagar(texto)
-            elif nome == "tributos":
-                resultado_final["tributos"] = processar_tributos(texto)
-            elif nome == "cnpj":
-                resultado_final["cnpj"] = processar_cnpj(texto)
-
+            linhas = extrair_texto_por_linhas(pdf_path, regioes["tabela_itens"]["coordenadas"])
+            resultado_final["itens_fatura"] = processar_tabela_itens(linhas, pdf_path)
         except Exception as e:
-            resultado_final[nome] = {"erro": f"Erro no processamento: {str(e)}", "texto_bruto": texto}
+            resultado_final["itens_fatura"] = {"erro": f"Erro na tabela: {str(e)}"}
 
     return resultado_final
-
 
 def main():
     caminho_pasta = Path(PASTA_PDFS)
