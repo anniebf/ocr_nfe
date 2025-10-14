@@ -10,11 +10,9 @@ from database.connect_oracle import retorno_cnpj_pdf
 from xml.dom.minidom import parseString, Node, Document  # Importação de Document
 import os
 
-
 # CONFIGURAÇÃO
 PASTA_PDFS = r"C:\bf_ocr\src\resource\pdf"
 
-# Regiões a serem extraídas (MANTIDAS)
 regioes = {
     "mais_a_cima": {"coordenadas": [(139.9, 4.1), (142.6, 46.2), (465.8, 42.1), (461.7, 6.8)],
                     "descricao": "Área mais acima"},
@@ -35,8 +33,6 @@ regioes = {
     "cnpj": {"coordenadas": [(43.9, 221.3), (159.8, 234.9), (43.1, 241.3), (159.0, 240.5)],
              "descricao": "cnpj"}
 }
-
-# No início do seu código, onde a lista ITENS_A_EXCLUIR_DO_CONSUMO está definida:
 
 ITENS_A_EXCLUIR_DO_CONSUMO = [
     # Termos originais (exemplo):
@@ -68,28 +64,25 @@ def normalizar_valor(valor_str: str,) -> float:
     valor_limpo = valor_str.strip()
     is_negativo = False
 
-    # 1. Verifica e trata formato contábil com parênteses
+    #Verifica e trata formato contábil com parênteses
     if valor_limpo.startswith('(') and valor_limpo.endswith(')'):
         valor_limpo = valor_limpo[1:-1]
         is_negativo = True
 
-    # 2. Verifica se há sinal de menos no início ou fim
+    #Verifica se há sinal de menos no início ou fim
     if '-' in valor_limpo:
         is_negativo = True
 
         valor_limpo = valor_limpo.replace('-', '')
 
-    # 3. Remove separadores de milhar e troca decimal
+    #Remove separadores de milhar e troca decimal
     valor_limpo = valor_limpo.replace('.', '')
     valor_limpo = valor_limpo.replace(',', '.')
 
     try:
         valor_float = float(valor_limpo)
-
-        # 4. Aplica o sinal negativo no float, se foi detectado
         if is_negativo:
             return -abs(valor_float)
-
         return valor_float
 
     except ValueError:
@@ -183,18 +176,15 @@ def processar_tabela_itens(linhas: List[Dict[str, Any]], pdf_path: str) -> List[
 
         descricao, valores_str = extrair_descricao_valores(texto_linha)
 
-        # 1. VERIFICAÇÃO DE SINAL NEGATIVO NA STRING BRUTA
-        # Verifica se o sinal de menos está na descrição ou na string de valores
-        # O formato contábil com parênteses também será tratado aqui.
+        # VERIFICAÇÃO DE SINAL NEGATIVO NA STRING BRUTA
         is_negativo = '-' in valores_str or '(' in valores_str or '-' in descricao
 
         # O seu regex atual precisa ser robusto para capturar valores negativos
-        # Vamos manter o regex atual e confiar na flag is_negativo
         valores = re.findall(r"-?\d{1,3}(?:\.\d{3})*(?:,\d+)?|-?\d+", valores_str)
 
         item_data = {'descricao': descricao}
 
-        # 2. APLICAÇÃO DO SINAL NEGATIVO AO PRIMEIRO VALOR ENCONTRADO (QUE DEVE SER O VALOR DO ITEM)
+        #APLICAÇÃO DO SINAL NEGATIVO AO PRIMEIRO VALOR ENCONTRADO (QUE DEVE SER O VALOR DO ITEM)
         if valores:
             valor_principal = valores[0]
 
@@ -209,13 +199,11 @@ def processar_tabela_itens(linhas: List[Dict[str, Any]], pdf_path: str) -> List[
                 'icms': valores[6], 'tarifa_unit': valores[7]
             })
         elif len(valores) == 5:
-            # Aqui, o valor do item é o primeiro valor capturado (valores[0])
             item_data.update({
                 'valor': valores[0], 'pis_confins': valores[1], 'base_calc_icms': valores[2],
                 'porcent_icms': valores[3], 'icms': valores[4]
             })
         elif valores:
-            # Aqui, o valor do item é o único valor capturado
             item_data.update({'valor': valores[0]})
 
         itens.append(item_data)
@@ -409,7 +397,7 @@ def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_d
         """Formata float para string no formato BR (1.234,56)."""
         return f"{valor_float:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
 
-    # 1. Agrega todos os itens a serem consolidados (tabela + tributos)
+    # Agrega todos os itens a serem consolidados (tabela + tributos)
     todos_os_itens = []
     todos_os_itens.extend(itens_tabela_brutos)
 
@@ -419,7 +407,7 @@ def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_d
             if item:
                 todos_os_itens.append(item)
 
-    # 2. Determinação dos valores consolidados
+    # Determinação dos valores consolidados
     valor_total_str = resultado_plano.get('pagamento', {}).get("total_pagar", "0,00")
     valor_total = normalizar_valor(valor_total_str)
     if valor_total_str =='0,00':
@@ -433,9 +421,7 @@ def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_d
         # Lógica de exclusão de taxa/serviço
         if any(termo in descricao for termo in ITENS_A_EXCLUIR_DO_CONSUMO):
 
-            # ESTA É A VERIFICAÇÃO QUE DESCONSIDERA VALORES NEGATIVOS:
             if valor < 0:
-
                 continue  # Não soma ao total_taxas_a_excluir, pula para o próximo item
 
             # Se a taxa for POSITIVA, ela é adicionada para ser excluída do consumo.
@@ -461,19 +447,18 @@ def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_d
 
     icms_data = tributos_data.get('icms', {})
 
-    # 1. Base de Cálculo (vinda da área 'tributos', ou 0.0 se não existir)
+    #Base de Cálculo (vinda da área 'tributos', ou 0.0 se não existir)
     base_calc_icms_float = normalizar_valor(icms_data.get('base_calculo', '0,00'))
 
-    # 2. Alíquota (vinda da área 'tributos', ou 0,00 se não existir)
+    # Alíquota (vinda da área 'tributos', ou 0,00 se não existir)
     aliquota_icms_str = icms_data.get('aliquota', '0,00')
 
-    # 3. Valor do ICMS (vinda da área 'tributos', ou 0.0 se não existir)
+    #Valor do ICMS (vinda da área 'tributos', ou 0.0 se não existir)
     valor_icms_float = normalizar_valor(icms_data.get('valor', '0,00'))
 
     # Inclusão no dicionário, formatando os floats para strings BR
     itens_fatura_dict['icms_base_calculo'] = formatar_valor_br(base_calc_icms_float)
-    itens_fatura_dict['icms_aliquota'] = aliquota_icms_str.replace('.',
-                                                                   ',')  # A alíquota já deve vir formatada, apenas garante vírgula
+    itens_fatura_dict['icms_aliquota'] = aliquota_icms_str.replace('.',',')
     itens_fatura_dict['icms_valor'] = formatar_valor_br(valor_icms_float)
 
     nota_fiscal_data = resultado_plano.get('nota_fiscal', {})
@@ -518,7 +503,7 @@ def converter_lote_para_xml(lote_dados: List[Dict[str, Any]]) -> str:
     """
     Converte o lote de dicionários de faturas em uma string XML formatada.
     """
-    # 1. Gera o XML inicial
+    # XML inicial
     xml_bytes = dicttoxml(
         lote_dados,
         custom_root='ContasdeEnergia',
@@ -552,15 +537,14 @@ def converter_lote_para_xml(lote_dados: List[Dict[str, Any]]) -> str:
             'cnpj_consumidor',
             'consumo',
             'taxa',
-            'icms_base_calculo',  # NOVO
-            'icms_aliquota',  # NOVO
-            'icms_valor'  # NOVO
+            'icms_base_calculo',
+            'icms_aliquota',
+            'icms_valor'
         ]
 
         for tag_name in tags_para_forcar_abertura:
             for tag_node in dom.getElementsByTagName(tag_name):
                 if not tag_node.hasChildNodes():
-                    # Adiciona um nó de texto vazio se a tag não tiver conteúdo
                     tag_node.appendChild(dom.createTextNode(''))
 
         # 3. Formata e retorna XML final
@@ -585,10 +569,7 @@ def main():
     for i, caminho_pdf in enumerate(arquivos_pdf, 1):
         print(f"Processando ({i}/{len(arquivos_pdf)}): {caminho_pdf.name}")
 
-        # MODIFICADO: Recebe o terceiro retorno: itens_tabela_brutos
         resultado_plano, tributos_data, itens_tabela_brutos = processar_regiao_parallel(caminho_pdf)
-
-        # MODIFICADO: Passa o terceiro argumento: itens_tabela_brutos
         dados_extraidos = extrair_informacoes_estruturadas(resultado_plano, tributos_data, itens_tabela_brutos)
 
         dados_extraidos['@id'] = str(i)
@@ -606,8 +587,6 @@ def main():
                 f.write(xml_output)
         except Exception as e:
             print(e)
-
-
 
 
 if __name__ == "__main__":
