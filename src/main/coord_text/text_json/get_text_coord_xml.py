@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dicttoxml import dicttoxml
 from database.connect_oracle import retorno_cnpj_pdf
 from xml.dom.minidom import parseString, Node, Document  # Importação de Document
-import pandas as pd
+import os
 
 
 # CONFIGURAÇÃO
@@ -43,48 +43,57 @@ ITENS_A_EXCLUIR_DO_CONSUMO = [
     "COMPENSACAO POR INDICADOR",  # Cobre parte do caso 3 e 5
     "COMP.INDICADOR-DIC",  # Cobre parte do caso 5
     "ATUALIZAÇÃO MONETARIA",
-    "DIF.CREDITO",  # Cobre parte do caso 5 (DIF.CREDITO A DEVOLVER)
-
-    # NOVOS TERMOS IDENTIFICADOS NO DEBUG:
+    "DIF.CREDITO",
     "CONTRIB DE ILUM PUB",  # Do Caso 2
     "ADIC. B. VERMELHA",  # Do Caso 3 e 5
-
-    # Se 'Adicional Conta Covid' for considerado taxa/serviço e não consumo
     "ADICIONAL CONTA COVID ESCASSEZ HÍDRICA",  # Do Caso 1 e 4
-
-    # Outras sugestões:
     "CUSTO DE DISPONIBILIDADE",  # Do Caso 5
-
-    # Os itens com DÉBITO TUSD e CRÉDITO TUSD (Caso 1 e 4) parecem ser
-    # ajustes internos e, se você quer que o Consumo seja o valor líquido
-    # da energia, eles também devem ser excluídos. Vamos adicionar DÉBITO/CRÉDITO
     "DÉBITO TUSD",
     "DEBITO TUSD",
     "CREDITO TUSD",
     "SUBSTITUIÇÃO TRIBUTÁRIA",  # Se for um ajuste, mas este é mais complexo
+    "DEVOLUÇÃO SUBSÍDIO",
 ]
 
-def normalizar_valor(valor_str: str) -> float:
-    """Converte string de valor (ex: '1.234,56') em float (1234.56)."""
+
+# VERIFIQUE SE ESTA É A VERSÃO DE normalizar_valor QUE VOCÊ ESTÁ USANDO
+def normalizar_valor(valor_str: str,) -> float:
+    """
+    Converte string de valor (ex: '1.234,56', '(1.234,56)', '-1.234,56') em float.
+    Lida com formato contábil (parênteses), sinal de menos em qualquer posição
+    e formatação de milhar/decimal brasileira.
+    """
     if not valor_str: return 0.0
+
+    valor_limpo = valor_str.strip()
+    is_negativo = False
+
+    # 1. Verifica e trata formato contábil com parênteses
+    if valor_limpo.startswith('(') and valor_limpo.endswith(')'):
+        valor_limpo = valor_limpo[1:-1]
+        is_negativo = True
+
+    # 2. Verifica se há sinal de menos no início ou fim
+    if '-' in valor_limpo:
+        is_negativo = True
+
+        valor_limpo = valor_limpo.replace('-', '')
+
+    # 3. Remove separadores de milhar e troca decimal
+    valor_limpo = valor_limpo.replace('.', '')
+    valor_limpo = valor_limpo.replace(',', '.')
+
     try:
-        return float(valor_str.replace('.', '').replace(',', '.'))
+        valor_float = float(valor_limpo)
+
+        # 4. Aplica o sinal negativo no float, se foi detectado
+        if is_negativo:
+            return -abs(valor_float)
+
+        return valor_float
+
     except ValueError:
         return 0.0
-
-
-def calcular_consumo_energia(valor_total_str: str, itens: List[Dict[str, Any]]) -> str:
-    """Calcula o consumo de energia / valor total - taxas de exclusão"""
-    valor_total = normalizar_valor(valor_total_str)
-    valor_taxas_excluir = 0.0
-    for item in itens:
-        descricao_item = item.get('descricao', '').upper()
-        valor_item = normalizar_valor(item.get('valor', '0,00'))
-        if any(termo in descricao_item for termo in ITENS_A_EXCLUIR_DO_CONSUMO):
-            valor_taxas_excluir += valor_item
-    consumo_energia_float = valor_total - valor_taxas_excluir
-    return f"{consumo_energia_float:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-
 
 def remove_empty_values(d: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -171,9 +180,28 @@ def processar_tabela_itens(linhas: List[Dict[str, Any]], pdf_path: str) -> List[
         texto_linha = linha['text'].strip()
         if not re.search(r"\d", texto_linha) or texto_linha.upper().startswith("TOTAL:"):
             continue
+
         descricao, valores_str = extrair_descricao_valores(texto_linha)
+
+        # 1. VERIFICAÇÃO DE SINAL NEGATIVO NA STRING BRUTA
+        # Verifica se o sinal de menos está na descrição ou na string de valores
+        # O formato contábil com parênteses também será tratado aqui.
+        is_negativo = '-' in valores_str or '(' in valores_str or '-' in descricao
+
+        # O seu regex atual precisa ser robusto para capturar valores negativos
+        # Vamos manter o regex atual e confiar na flag is_negativo
         valores = re.findall(r"-?\d{1,3}(?:\.\d{3})*(?:,\d+)?|-?\d+", valores_str)
+
         item_data = {'descricao': descricao}
+
+        # 2. APLICAÇÃO DO SINAL NEGATIVO AO PRIMEIRO VALOR ENCONTRADO (QUE DEVE SER O VALOR DO ITEM)
+        if valores:
+            valor_principal = valores[0]
+
+            if is_negativo and not (valor_principal.startswith('-') or valor_principal.startswith('(')):
+                # Garante que o sinal de menos esteja no valor para que normalizar_valor o reconheça
+                valores[0] = f'-{valor_principal}'
+
         if len(valores) >= 8:
             item_data.update({
                 'quantidade': valores[0], 'preco_unit_com_tributos': valores[1], 'valor': valores[2],
@@ -181,24 +209,17 @@ def processar_tabela_itens(linhas: List[Dict[str, Any]], pdf_path: str) -> List[
                 'icms': valores[6], 'tarifa_unit': valores[7]
             })
         elif len(valores) == 5:
+            # Aqui, o valor do item é o primeiro valor capturado (valores[0])
             item_data.update({
                 'valor': valores[0], 'pis_confins': valores[1], 'base_calc_icms': valores[2],
                 'porcent_icms': valores[3], 'icms': valores[4]
             })
         elif valores:
+            # Aqui, o valor do item é o único valor capturado
             item_data.update({'valor': valores[0]})
+
         itens.append(item_data)
     return itens
-
-
-def processar_area_mais_acima(texto: str) -> Dict[str, Any]:
-    linhas = texto.split('\n')
-    resultado = {}
-    if len(linhas) >= 2: resultado["distribuidora_energia"] = linhas[1].strip()
-    if len(linhas) >= 4:
-        cep_match = re.search(r'\b\d{5}-?\d{3}\b', linhas[3])
-        if cep_match: resultado["cep"] = cep_match.group()
-    return resultado
 
 
 def processar_cnpj(texto: str, nome_titular="") -> dict:
@@ -334,7 +355,6 @@ def processar_tributos(texto: str) -> Dict[str, Any]:
     return resultado
 
 
-
 def processar_regiao_parallel(caminho_pdf):
     """
     Processa todas as regiões do PDF. Retorna 3 valores.
@@ -367,19 +387,14 @@ def processar_regiao_parallel(caminho_pdf):
             resultado_plano['cliente'] = processar_nome_endereco(texto)
         elif nome_regiao == 'roteiro_tensao':
             resultado_plano['roteiro_tensao'] = processar_roteiro_tensao(texto)
-        elif nome_regiao == 'mais_a_cima':
-            resultado_plano['informacoes_superiores'] = processar_area_mais_acima(texto)
+        '''elif nome_regiao == 'mais_a_cima':
+            resultado_plano['informacoes_superiores'] = processar_area_mais_acima(texto)'''
 
     # CORRETO: Retorna 3 valores
     return resultado_plano, tributos_data, itens_tabela_brutos
 
 
-# ----------------------------------------------------------------------
-# 2. FUNÇÃO DE ESTRUTURAÇÃO E CÁLCULO (Corrigida para tags simples e DEBUG)
-# ----------------------------------------------------------------------
-
-def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_data: Dict[str, Any],
-                                     itens_tabela_brutos: List[Dict[str, Any]]) -> Dict[str, Any]:
+def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_data: Dict[str, Any],itens_tabela_brutos: List[Dict[str, Any]]) -> Dict[str, Any]:
     def criar_item_tributo(nome_tributo: str, dados_tributo: Dict[str, str]) -> Dict[str, Any]:
         """Cria um item de fatura a partir de dados de tributo."""
         if not dados_tributo: return None
@@ -407,26 +422,30 @@ def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_d
     # 2. Determinação dos valores consolidados
     valor_total_str = resultado_plano.get('pagamento', {}).get("total_pagar", "0,00")
     valor_total = normalizar_valor(valor_total_str)
-
+    if valor_total_str =='0,00':
+        valor_total_str = '0,01'
     total_taxas_a_excluir = 0.0
     for item in todos_os_itens:
         descricao = item.get('descricao', '').upper()
+        # Aqui, 'valor' JÁ É UM FLOAT NEGATIVO (ex: -1234.56) se a string de origem tinha o '-'
         valor = normalizar_valor(item.get('valor', '0,00'))
 
         # Lógica de exclusão de taxa/serviço
         if any(termo in descricao for termo in ITENS_A_EXCLUIR_DO_CONSUMO):
-            total_taxas_a_excluir += valor
 
-    # ------------------ DEBUG START ------------------
-    # USE ESSAS LINHAS PARA VERIFICAR ONDE ESTÁ A FALHA NO CÁLCULO
-    #print("--- DEBUG EXTRAÇÃO ---")
+            # ESTA É A VERIFICAÇÃO QUE DESCONSIDERA VALORES NEGATIVOS:
+            if valor < 0:
+
+                continue  # Não soma ao total_taxas_a_excluir, pula para o próximo item
+
+            # Se a taxa for POSITIVA, ela é adicionada para ser excluída do consumo.
+            total_taxas_a_excluir += valor  #
     #print(f"Valor Total da Nota (zzb_valor): {valor_total}")
     #print(f"Itens Brutos Encontrados (Tabela + Tributos):\n{json.dumps(todos_os_itens, indent=2)}")
     #print(f"Total de Taxas a Excluir (Identificado pela lista ITENS_A_EXCLUIR_DO_CONSUMO): {total_taxas_a_excluir}")
-    #print("----------------------")
-    # ------------------ DEBUG END --------------------
-
     # Cálculo de Consumo e Taxas Consolidadas
+
+    print(total_taxas_a_excluir)
     consumo_real = max(valor_total - total_taxas_a_excluir, 0.0)
     total_taxas_consolidadas = valor_total - consumo_real
 
@@ -440,8 +459,23 @@ def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_d
     if total_taxas_consolidadas > 0.0:
         itens_fatura_dict['taxa'] = formatar_valor_br(total_taxas_consolidadas)
 
-    # Restante do processamento do cabeçalho
-    # ... (código do cabeçalho mantido) ...
+    icms_data = tributos_data.get('icms', {})
+
+    # 1. Base de Cálculo (vinda da área 'tributos', ou 0.0 se não existir)
+    base_calc_icms_float = normalizar_valor(icms_data.get('base_calculo', '0,00'))
+
+    # 2. Alíquota (vinda da área 'tributos', ou 0,00 se não existir)
+    aliquota_icms_str = icms_data.get('aliquota', '0,00')
+
+    # 3. Valor do ICMS (vinda da área 'tributos', ou 0.0 se não existir)
+    valor_icms_float = normalizar_valor(icms_data.get('valor', '0,00'))
+
+    # Inclusão no dicionário, formatando os floats para strings BR
+    itens_fatura_dict['icms_base_calculo'] = formatar_valor_br(base_calc_icms_float)
+    itens_fatura_dict['icms_aliquota'] = aliquota_icms_str.replace('.',
+                                                                   ',')  # A alíquota já deve vir formatada, apenas garante vírgula
+    itens_fatura_dict['icms_valor'] = formatar_valor_br(valor_icms_float)
+
     nota_fiscal_data = resultado_plano.get('nota_fiscal', {})
     pagamento_data = resultado_plano.get('pagamento', {})
     consumo_energia_str = formatar_valor_br(consumo_real)
@@ -453,6 +487,7 @@ def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_d
     elif isinstance(cnpj_dados_brutos, list) and len(cnpj_dados_brutos) > 0:
         if isinstance(cnpj_dados_brutos[0], list) and len(cnpj_dados_brutos[0]) > 0:
             cnpj_completo_valor = cnpj_dados_brutos[0][0]
+
 
     cabecalho = {
         "zzb_tpdoc": "nfcee",
@@ -478,10 +513,6 @@ def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_d
 
     return resultado_estruturado
 
-
-# ----------------------------------------------------------------------
-# 3. FUNÇÃO DE CONVERSÃO PARA XML (Mínima alteração para forçar tags vazias)
-# ----------------------------------------------------------------------
 
 def converter_lote_para_xml(lote_dados: List[Dict[str, Any]]) -> str:
     """
@@ -517,8 +548,15 @@ def converter_lote_para_xml(lote_dados: List[Dict[str, Any]]) -> str:
                 arquivo.removeChild(key_node)
 
         # 2. Ajuste para forçar tags vazias
-        # Adicionamos 'consumo' e 'taxa' aqui para garantir que se o valor for 0,00, a tag fique vazia.
-        tags_para_forcar_abertura = ['cnpj_consumidor', 'consumo', 'taxa']
+        tags_para_forcar_abertura = [
+            'cnpj_consumidor',
+            'consumo',
+            'taxa',
+            'icms_base_calculo',  # NOVO
+            'icms_aliquota',  # NOVO
+            'icms_valor'  # NOVO
+        ]
+
         for tag_name in tags_para_forcar_abertura:
             for tag_node in dom.getElementsByTagName(tag_name):
                 if not tag_node.hasChildNodes():
@@ -532,6 +570,7 @@ def converter_lote_para_xml(lote_dados: List[Dict[str, Any]]) -> str:
     except Exception as e:
         print(f"Erro ao manipular/formatar XML: {e}")
         return xml_bytes.decode('utf-8')
+
 
 def main():
     caminho_pasta = Path(PASTA_PDFS)
@@ -559,7 +598,15 @@ def main():
 
     if todas_faturas:
         xml_output = converter_lote_para_xml(todas_faturas)
-        print(xml_output)
+        nome_arquivo_saida = "Contas_de_Energia.xml"
+        caminho_saida = os.path.join(fr"C:\bf_ocr\src\main\coord_text\text_json", nome_arquivo_saida)
+
+        try:
+            with open(caminho_saida, 'w', encoding='utf-8') as f:
+                f.write(xml_output)
+        except Exception as e:
+            print(e)
+
 
 
 
