@@ -1,5 +1,5 @@
 import pdfplumber
-import json
+from datetime import datetime
 import re
 from typing import Dict, Any, List, Tuple
 from pathlib import Path
@@ -431,7 +431,6 @@ def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_d
     #print(f"Total de Taxas a Excluir (Identificado pela lista ITENS_A_EXCLUIR_DO_CONSUMO): {total_taxas_a_excluir}")
     # Cálculo de Consumo e Taxas Consolidadas
 
-    print(total_taxas_a_excluir)
     consumo_real = max(valor_total - total_taxas_a_excluir, 0.0)
     total_taxas_consolidadas = valor_total - consumo_real
 
@@ -439,11 +438,11 @@ def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_d
     itens_fatura_dict = {}
 
     # Consumo é sempre adicionado
-    itens_fatura_dict['consumo'] = formatar_valor_br(consumo_real)
+    itens_fatura_dict['ValorConsumo'] = formatar_valor_br(consumo_real)
 
     # Taxas/Serviços são adicionadas apenas se > 0.0
     if total_taxas_consolidadas > 0.0:
-        itens_fatura_dict['taxa'] = formatar_valor_br(total_taxas_consolidadas)
+        itens_fatura_dict['ValorTaxas'] = formatar_valor_br(total_taxas_consolidadas)
 
     icms_data = tributos_data.get('icms', {})
 
@@ -457,9 +456,9 @@ def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_d
     valor_icms_float = normalizar_valor(icms_data.get('valor', '0,00'))
 
     # Inclusão no dicionário, formatando os floats para strings BR
-    itens_fatura_dict['icms_base_calculo'] = formatar_valor_br(base_calc_icms_float)
-    itens_fatura_dict['icms_aliquota'] = aliquota_icms_str.replace('.',',')
-    itens_fatura_dict['icms_valor'] = formatar_valor_br(valor_icms_float)
+    itens_fatura_dict['BaseCalculoICMS'] = formatar_valor_br(base_calc_icms_float)
+    itens_fatura_dict['AliquotaICMS'] = aliquota_icms_str.replace('.',',')
+    itens_fatura_dict['ValorICMS'] = formatar_valor_br(valor_icms_float)
 
     nota_fiscal_data = resultado_plano.get('nota_fiscal', {})
     pagamento_data = resultado_plano.get('pagamento', {})
@@ -475,21 +474,19 @@ def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_d
 
 
     cabecalho = {
-        "zzb_tpdoc": "nfcee",
-        "ZZB_ESPEC1": "nfcee",
-        "zzb_dtemiss": nota_fiscal_data.get("data_emissao", ""),
-        "zzb_doc": nota_fiscal_data.get("numero_nota_fiscal", ""),
-        "zzb_serie": nota_fiscal_data.get("serie_nota_fiscal", ""),
-        "cnpj_consumidor": cnpj_completo_valor,
-        "zzb_valor": valor_total_str,
-        "codigo_cliente": resultado_plano.get('codigo_cliente', {}).get('codigo_cliente', ''),
-        "mes_ano": pagamento_data.get("mes_ano_referencia", ""),
-        "vencimento": pagamento_data.get("data_vencimento", ""),
+        "TipoDocumento": "nfcee",
+        "EspecieDocumento": "nfcee",
+        "DataEmissao": nota_fiscal_data.get("data_emissao", ""),
+        "NumeroDocumento": nota_fiscal_data.get("numero_nota_fiscal", ""),
+        "Serie": nota_fiscal_data.get("serie_nota_fiscal", ""),
+        "CnpjConsumidor": cnpj_completo_valor,
+        "ValorTotal": valor_total_str,
+        "CodigoCliente": resultado_plano.get('codigo_cliente', {}).get('codigo_cliente', ''),
+        "ReferenciaMesAno": pagamento_data.get("mes_ano_referencia", ""),
+        "DataVencimento": pagamento_data.get("data_vencimento", ""),
     }
 
     cabecalho_limpo = remove_empty_values(cabecalho)
-    if 'cnpj_consumidor' not in cabecalho_limpo: cabecalho_limpo['cnpj_consumidor'] = ""
-    if 'consumo_energia' not in cabecalho_limpo: cabecalho_limpo['consumo_energia'] = ""
 
     resultado_estruturado = {
         "cabecalho": cabecalho_limpo,
@@ -499,6 +496,65 @@ def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_d
     return resultado_estruturado
 
 
+def filtrar_faturas_duplicadas(todas_faturas: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Filtra a lista de faturas, mantendo apenas a fatura mais recente
+    para cada unidade consumidora duplicado.
+    """
+    faturas_por_cliente = {}
+
+    for fatura in todas_faturas:
+        cabecalho = fatura.get('cabecalho', {})
+        codigo_cliente = cabecalho.get('CodigoCliente')
+        data_emissao_str = cabecalho.get('DataEmissao')
+
+        if not codigo_cliente or not data_emissao_str:
+            # Se faltar o código do cliente ou a data
+            print(
+                f"Aviso: Fatura {fatura.get('@nome', 'sem nome')} será mantida - faltando código de cliente ou data de emissão.")
+            if codigo_cliente not in faturas_por_cliente:
+                faturas_por_cliente[f'{codigo_cliente}_ou_sem_data'] = [fatura]
+            continue
+
+        try:
+            data_emissao = datetime.strptime(data_emissao_str, '%d/%m/%Y')
+        except ValueError:
+            print(
+                f"Aviso: Fatura {fatura.get('@nome', 'sem nome')} com formato de data inválido ({data_emissao_str}). Será mantida.")
+            # Trata como única
+            if codigo_cliente not in faturas_por_cliente:
+                faturas_por_cliente[f'{codigo_cliente}_ou_sem_data'] = [fatura]
+            continue
+
+        # Estrutura de armazenamento: (data_emissao_datetime, fatura_dict)
+        cliente_key = codigo_cliente
+
+        if cliente_key not in faturas_por_cliente:
+            # Primeira fatura para este cliente
+            faturas_por_cliente[cliente_key] = (data_emissao, fatura)
+        else:
+            # Faturas subsequentes: verifica se é mais recente
+            data_existente, fatura_existente = faturas_por_cliente[cliente_key]
+
+            if data_emissao > data_existente:
+                # Substitui a fatura mais antiga pela nova
+                print(
+                    f"Substituindo fatura de {cliente_key}: '{fatura_existente.get('@nome')}' ({data_existente.strftime('%d/%m/%Y')}) por '{fatura.get('@nome')}' ({data_emissao_str}).")
+                faturas_por_cliente[cliente_key] = (data_emissao, fatura)
+            elif data_emissao < data_existente:
+                # Descarta a fatura atual
+                print(
+                    f"Descartando fatura de {cliente_key}: '{fatura.get('@nome')}' ({data_emissao_str}) - mais antiga que a já registrada ('{fatura_existente.get('@nome')}').")
+            else:
+                # Datas iguais, pode manter a primeira ou a última encontrada (mantendo a última aqui)
+                print(
+                    f"Aviso: Faturas de {cliente_key} com a mesma data de emissão ({data_emissao_str}). Mantendo a última encontrada.")
+                faturas_por_cliente[cliente_key] = (data_emissao, fatura)
+
+    # Retorna a lista apenas com as faturas mais recentes
+    return [fatura for _, fatura in faturas_por_cliente.values()]
+
+
 def converter_lote_para_xml(lote_dados: List[Dict[str, Any]]) -> str:
     """
     Converte o lote de dicionários de faturas em uma string XML formatada.
@@ -506,7 +562,7 @@ def converter_lote_para_xml(lote_dados: List[Dict[str, Any]]) -> str:
     # XML inicial
     xml_bytes = dicttoxml(
         lote_dados,
-        custom_root='ContasdeEnergia',
+        custom_root='NotaFiscalEnergia',
         attr_type=False,
         item_func=lambda x: 'arquivo'
     )
@@ -534,12 +590,12 @@ def converter_lote_para_xml(lote_dados: List[Dict[str, Any]]) -> str:
 
         # 2. Ajuste para forçar tags vazias
         tags_para_forcar_abertura = [
-            'cnpj_consumidor',
-            'consumo',
-            'taxa',
-            'icms_base_calculo',
-            'icms_aliquota',
-            'icms_valor'
+            'CnpjConsumidora',
+            'ValorConsumo',
+            'ValorTaxas',
+            'BaseCalculoICMS',
+            'AliquotaICMS',
+            'ValorICMS'
         ]
 
         for tag_name in tags_para_forcar_abertura:
@@ -578,7 +634,8 @@ def main():
         todas_faturas.append(dados_extraidos)
 
     if todas_faturas:
-        xml_output = converter_lote_para_xml(todas_faturas)
+        faturas_filtradas = filtrar_faturas_duplicadas(todas_faturas)
+        xml_output = converter_lote_para_xml(faturas_filtradas)
         nome_arquivo_saida = "Contas_de_Energia.xml"
         caminho_saida = os.path.join(fr"C:\bf_ocr\src\main\coord_text\text_json", nome_arquivo_saida)
 
