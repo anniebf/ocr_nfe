@@ -597,8 +597,8 @@ def processar_regiao_parallel(nome, texto, resultado_parcial):
             return "tributos", processar_tributos(texto)
         elif nome == "cnpj":
             # CNPJ precisa esperar o cliente estar pronto
-            cep = resultado_parcial.get('cliente', {}).get('CEP', '')
-            return "cnpj", processar_cnpj(texto, cep)
+            nome_titular = resultado_parcial.get('cliente', {}).get('nome_titular', '')
+            return "cnpj", processar_cnpj(texto, nome_titular)
     except Exception as e:
         return nome, {"erro": f"Erro no processamento: {str(e)}", "texto_bruto": texto}
 

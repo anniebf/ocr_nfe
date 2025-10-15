@@ -6,6 +6,8 @@ from typing import Dict, Any, List, Tuple
 from pathlib import Path
 import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
+from database.connect_oracle import retorno_cnpj_pdf
+
 # CONFIGURAÇÃO
 PASTA_PDFS = r"C:\bf_ocr\src\resource\pdf_refaturado"
 ARQUIVO_EXCEL_SAIDA = r"C:\bf_ocr\src\resource\pdf_refaturado\faturas_processadas_botzin.xlsx"
@@ -453,10 +455,6 @@ def processar_tributos(texto: str) -> Dict[str, Any]:
             }
 
     return resultado
-
-
-import concurrent.futures
-from concurrent.futures import ThreadPoolExecutor
 
 
 def processar_regiao_parallel(nome, texto, resultado_parcial):

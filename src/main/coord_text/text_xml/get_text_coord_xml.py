@@ -12,6 +12,7 @@ import os
 
 # CONFIGURAÇÃO
 PASTA_PDFS = r"C:\bf_ocr\src\resource\pdf"
+PASTA_XML=fr"/src/main/coord_text/text_xml"
 
 regioes = {
     "mais_a_cima": {"coordenadas": [(139.9, 4.1), (142.6, 46.2), (465.8, 42.1), (461.7, 6.8)],
@@ -637,7 +638,7 @@ def main():
         faturas_filtradas = filtrar_faturas_duplicadas(todas_faturas)
         xml_output = converter_lote_para_xml(faturas_filtradas)
         nome_arquivo_saida = "Contas_de_Energia.xml"
-        caminho_saida = os.path.join(fr"C:\bf_ocr\src\main\coord_text\text_json", nome_arquivo_saida)
+        caminho_saida = os.path.join(PASTA_XML, nome_arquivo_saida) #############################################################
 
         try:
             with open(caminho_saida, 'w', encoding='utf-8') as f:

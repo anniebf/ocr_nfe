@@ -11,7 +11,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 # CONFIGURAÇÃO
 PASTA_PDFS = r"C:\bf_ocr\src\resource\pdf"
-ARQUIVO_EXCEL_SAIDA = r"C:\bf_ocr\src\resource\pdf\faturas_processadas_botzin.xlsx"
+#ARQUIVO_EXCEL_SAIDA = r"C:\Users\hianny.urt\Downloads\FATURAS DE ENERGIA - AGOSTO\faturas_processadas_botzin.xlsx"
 
 # Regiões a serem extraídas
 regioes = {
@@ -230,7 +230,6 @@ def processar_area_mais_acima(texto: str) -> Dict[str, Any]:
             resultado["cep"] = cep_match.group()
 
     return resultado
-
 
 
 def processar_cnpj(texto: str, nome_titular="") -> dict:
@@ -457,10 +456,6 @@ def processar_tributos(texto: str) -> Dict[str, Any]:
     return resultado
 
 
-import concurrent.futures
-from concurrent.futures import ThreadPoolExecutor
-
-
 def processar_regiao_parallel(nome, texto, resultado_parcial):
     """Processa uma região individual em thread"""
     try:
@@ -604,7 +599,6 @@ def criar_dataframe_consolidado(dados_todos_pdfs: List[Tuple[str, Dict[str, Any]
         linhas_consolidadas.append(linha)
 
     return pd.DataFrame(linhas_consolidadas)
-
 
 
 def main():

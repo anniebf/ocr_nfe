@@ -13,7 +13,7 @@ ESSE CODIGO ABRE UM PDF QUE ME PERMITE PEGAR AS COORDENADAS DELE
 
 
 # CONFIGURAÇÃO: Altere este caminho para o seu arquivo PDF
-CAMINHO_PDF =  r"C:\bf_ocr\src\resource\pdf\EMP 22 FL 8B01001-2789122-NOTA FISCAL Nº 020.663.927 - Série 002 ok.pdf"
+CAMINHO_PDF =  r"C:\bf_ocr\src\resource\pdf_fino/EMP 16 FL 1008081 - 4668543 -NOTA FISCAL Nº 044.606.418 - Série 001 OK.pdf"
 
 
 def mostrar_pdf_com_coordenadas(pdf_path):
