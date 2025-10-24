@@ -12,7 +12,7 @@ import os
 
 # CONFIGURAÇÃO
 PASTA_PDFS = r"C:\bf_ocr\src\resource\pdf"
-PASTA_XML=fr"/src/main/coord_text/text_xml"
+PASTA_XML="C:\\bf_ocr\\\src\\resource\\xml"
 
 regioes = {
     "mais_a_cima": {"coordenadas": [(139.9, 4.1), (142.6, 46.2), (465.8, 42.1), (461.7, 6.8)],
@@ -36,24 +36,22 @@ regioes = {
 }
 
 ITENS_A_EXCLUIR_DO_CONSUMO = [
-    # Termos originais (exemplo):
-    "COMPENSACAO POR INDICADOR",  # Cobre parte do caso 3 e 5
-    "COMP.INDICADOR-DIC",  # Cobre parte do caso 5
+    "COMPENSACAO POR INDICADOR",
+    "COMP.INDICADOR-DIC",
     "ATUALIZAÇÃO MONETARIA",
     "DIF.CREDITO",
-    "CONTRIB DE ILUM PUB",  # Do Caso 2
-    "ADIC. B. VERMELHA",  # Do Caso 3 e 5
-    "ADICIONAL CONTA COVID ESCASSEZ HÍDRICA",  # Do Caso 1 e 4
-    "CUSTO DE DISPONIBILIDADE",  # Do Caso 5
+    "CONTRIB DE ILUM PUB",
+    "ADIC. B. VERMELHA",
+    "ADICIONAL CONTA COVID ESCASSEZ HÍDRICA",
+    "CUSTO DE DISPONIBILIDADE",
     "DÉBITO TUSD",
     "DEBITO TUSD",
     "CREDITO TUSD",
-    "SUBSTITUIÇÃO TRIBUTÁRIA",  # Se for um ajuste, mas este é mais complexo
+    "SUBSTITUIÇÃO TRIBUTÁRIA",
     "DEVOLUÇÃO SUBSÍDIO",
 ]
 
 
-# VERIFIQUE SE ESTA É A VERSÃO DE normalizar_valor QUE VOCÊ ESTÁ USANDO
 def normalizar_valor(valor_str: str,) -> float:
     """
     Converte string de valor (ex: '1.234,56', '(1.234,56)', '-1.234,56') em float.
@@ -556,61 +554,121 @@ def filtrar_faturas_duplicadas(todas_faturas: List[Dict[str, Any]]) -> List[Dict
     return [fatura for _, fatura in faturas_por_cliente.values()]
 
 
-def converter_lote_para_xml(lote_dados: List[Dict[str, Any]]) -> str:
-    """
-    Converte o lote de dicionários de faturas em uma string XML formatada.
-    """
-    # XML inicial
-    xml_bytes = dicttoxml(
-        lote_dados,
-        custom_root='NotaFiscalEnergia',
-        attr_type=False,
-        item_func=lambda x: 'arquivo'
-    )
+# A sua lista de importações já tem tudo que é necessário (Document, os, etc.)
 
-    try:
-        dom = parseString(xml_bytes)
+def salvar_xmls_por_cnpj(faturas_dados: List[Dict[str, Any]], pasta_saida: str):
+    """
+    Converte as faturas em strings XML separadas e as salva na pasta de saída,
+    agrupadas/nomeadas com base no CNPJ.
+    """
+    if not faturas_dados:
+        print("Nenhuma fatura para salvar.")
+        return
 
-        # Processa cada elemento <arquivo> para mover atributos e limpar tags <key>
-        arquivos = dom.getElementsByTagName('arquivo')
-        for arquivo in arquivos:
+    # 1. Cria a pasta de saída se não existir
+    Path(pasta_saida).mkdir(parents=True, exist_ok=True)
+
+    # 2. Converte cada dicionário para sua string XML formatada, individualmente
+    # O dicttoxml e manipulação de DOM é feita dentro desta função
+    lista_xml_strings = converter_lote_para_xml_separado(faturas_dados)
+
+    # 3. Salva cada XML, usando o CNPJ e o nome do arquivo original no nome.
+    for i, xml_string in enumerate(lista_xml_strings):
+        dados_fatura = faturas_dados[i]  # Usa o índice para obter os metadados do dict original
+
+        # Extrai CNPJ e Nome do Arquivo para o nome do arquivo XML
+        cnpj_consumidor = dados_fatura.get('cabecalho', {}).get('CnpjConsumidor')
+        nome_original_pdf = dados_fatura.get('@nome', f"arquivo_{i}.pdf")
+
+        # O CNPJ é crucial para o agrupamento/nome
+        if not cnpj_consumidor:
+            print(f"Aviso: CNPJ não encontrado para o arquivo {nome_original_pdf}. Pulando salvamento.")
+            continue
+
+        # Limpa o nome do PDF (ex: 'fatura.pdf' -> 'fatura')
+        nome_base = Path(nome_original_pdf).stem
+
+        # Define o nome do arquivo: [CNPJ]-[NomeOriginalPDF].xml
+        nome_arquivo_saida = f"{cnpj_consumidor}.xml"
+        caminho_saida = Path(pasta_saida) / nome_arquivo_saida
+
+        try:
+            with open(caminho_saida, 'w', encoding='utf-8') as f:
+                f.write(xml_string)
+            print(f"XML salvo com sucesso: {caminho_saida.name}")
+        except Exception as e:
+            print(f"Erro ao salvar o arquivo {nome_arquivo_saida}: {e}")
+
+def converter_lote_para_xml_separado(lote_dados: List[Dict[str, Any]]) -> List[str]:
+    """
+    Converte o lote de dicionários de faturas em uma lista de strings XML formatadas,
+    onde cada string representa uma fatura (arquivo) individual.
+    """
+    lista_xml = []
+
+    # 1. Itera sobre cada dicionário de dados (cada fatura)
+    for dados_fatura in lote_dados:
+        try:
+            # 1.1. Converte o dicionário atual para XML
+            # Use o custom_root adequado para a fatura individual
+            xml_bytes = dicttoxml(
+                dados_fatura,
+                custom_root='NotaFiscalEnergia',  # O root para o XML de uma única fatura
+                attr_type=False,
+                item_func=lambda x: 'fatura_detalhe'
+                # Um nome de tag interna temporária, se necessário, mas para um único dict, o root já basta.
+            )
+
+            dom = parseString(xml_bytes)
+            root = dom.documentElement  # O elemento <NotaFiscalEnergia>
+
             keys_to_remove = []
-            for child in list(arquivo.childNodes):
+            for child in list(root.childNodes):
                 if child.nodeType == Node.ELEMENT_NODE and child.tagName == 'key':
                     key_name = child.getAttribute('name')
                     key_value = child.firstChild.nodeValue if child.firstChild else ""
+
+                    # Adapte a lógica: os atributos 'id' e 'nome' devem ir para o <NotaFiscalEnergia>
                     if key_name == '@id':
-                        arquivo.setAttribute('id', key_value)
+                        root.setAttribute('id', key_value)
                         keys_to_remove.append(child)
                     elif key_name == '@nome':
-                        arquivo.setAttribute('nome', key_value)
+                        root.setAttribute('nome', key_value)
                         keys_to_remove.append(child)
 
             for key_node in keys_to_remove:
-                arquivo.removeChild(key_node)
+                root.removeChild(key_node)
 
-        # 2. Ajuste para forçar tags vazias
-        tags_para_forcar_abertura = [
-            'CnpjConsumidora',
-            'ValorConsumo',
-            'ValorTaxas',
-            'BaseCalculoICMS',
-            'AliquotaICMS',
-            'ValorICMS'
-        ]
+            # 3. Ajuste para forçar tags vazias
+            tags_para_forcar_abertura = [
+                'CnpjConsumidora',
+                'ValorConsumo',
+                'ValorTaxas',
+                'BaseCalculoICMS',
+                'AliquotaICMS',
+                'ValorICMS'
+            ]
 
-        for tag_name in tags_para_forcar_abertura:
-            for tag_node in dom.getElementsByTagName(tag_name):
-                if not tag_node.hasChildNodes():
-                    tag_node.appendChild(dom.createTextNode(''))
+            for tag_name in tags_para_forcar_abertura:
+                for tag_node in dom.getElementsByTagName(tag_name):
+                    if not tag_node.hasChildNodes():
+                        tag_node.appendChild(dom.createTextNode(''))
 
-        # 3. Formata e retorna XML final
-        xml_formatado = dom.toprettyxml(indent="  ")
-        return "\n".join(xml_formatado.split('\n')[1:]).strip()
+            # 4. Formata e adiciona à lista
+            xml_formatado = dom.toprettyxml(indent="  ")
+            # Remove a declaração XML (a primeira linha) e espaços em branco
+            xml_final = "\n".join(xml_formatado.split('\n')[1:]).strip()
+            lista_xml.append(xml_final)
 
-    except Exception as e:
-        print(f"Erro ao manipular/formatar XML: {e}")
-        return xml_bytes.decode('utf-8')
+        except Exception as e:
+            # Se der erro em um arquivo, imprime o erro e pula para o próximo
+            print(f"Erro ao manipular/formatar XML para um dos arquivos: {e}")
+            # Em caso de erro, você pode optar por adicionar a versão sem formatação ou apenas ignorar o arquivo
+            lista_xml.append(
+                xml_bytes.decode('utf-8') if 'xml_bytes' in locals() else f"ERRO NO PROCESSAMENTO: {e}")
+            continue
+
+    return lista_xml
 
 
 def main():
@@ -636,15 +694,8 @@ def main():
 
     if todas_faturas:
         faturas_filtradas = filtrar_faturas_duplicadas(todas_faturas)
-        xml_output = converter_lote_para_xml(faturas_filtradas)
-        nome_arquivo_saida = "Contas_de_Energia.xml"
-        caminho_saida = os.path.join(PASTA_XML, nome_arquivo_saida) #############################################################
-
-        try:
-            with open(caminho_saida, 'w', encoding='utf-8') as f:
-                f.write(xml_output)
-        except Exception as e:
-            print(e)
+        salvar_xmls_por_cnpj(faturas_filtradas, PASTA_XML)
+        print("\nProcessamento concluído. XMLs salvos na pasta:", PASTA_XML)
 
 
 if __name__ == "__main__":

@@ -1,187 +1,22 @@
 <NotaFiscalEnergia>
-  <arquivo id="1" nome="EMP 16 FL 1001001-1730312-NOTA FISCAL Nº 020.841.128 - Série 002 - OK.pdf">
+  <arquivo id="2" nome="ENERGISAMT-ReFat-Matricula-0001517133-09-2025.PDF">
     <cabecalho>
       <TipoDocumento>nfcee</TipoDocumento>
       <EspecieDocumento>nfcee</EspecieDocumento>
-      <DataEmissao>18/07/2025</DataEmissao>
-      <NumeroDocumento>020.841.128</NumeroDocumento>
-      <Serie>2</Serie>
-      <CnpjConsumidor>10425282000122</CnpjConsumidor>
-      <ValorTotal>22.700,59</ValorTotal>
-      <CodigoCliente>6/1730312-4</CodigoCliente>
-      <ReferenciaMesAno>Julho/2025</ReferenciaMesAno>
-      <DataVencimento>16/08/2025</DataVencimento>
-    </cabecalho>
-    <itens>
-      <ValorConsumo>21.169,26</ValorConsumo>
-      <ValorTaxas>1.531,33</ValorTaxas>
-      <BaseCalculoICMS>45.219,07</BaseCalculoICMS>
-      <AliquotaICMS>17,00</AliquotaICMS>
-      <ValorICMS>7.687,25</ValorICMS>
-    </itens>
-  </arquivo>
-  <arquivo id="2" nome="EMP 16 FL 1001001-2703074-NOTA FISCAL Nº 020.429.962 - Série 002 - OK.pdf">
-    <cabecalho>
-      <TipoDocumento>nfcee</TipoDocumento>
-      <EspecieDocumento>nfcee</EspecieDocumento>
-      <DataEmissao>03/07/2025</DataEmissao>
-      <NumeroDocumento>020.429.962</NumeroDocumento>
-      <Serie>2</Serie>
-      <CnpjConsumidor>10425282000122</CnpjConsumidor>
-      <ValorTotal>55.299,80</ValorTotal>
-      <CodigoCliente>6/2703074-1</CodigoCliente>
-      <ReferenciaMesAno>Julho/2025</ReferenciaMesAno>
-      <DataVencimento>16/08/2025</DataVencimento>
-    </cabecalho>
-    <itens>
-      <ValorConsumo>55.278,71</ValorConsumo>
-      <ValorTaxas>21,09</ValorTaxas>
-      <BaseCalculoICMS>7.039,02</BaseCalculoICMS>
-      <AliquotaICMS>17,00</AliquotaICMS>
-      <ValorICMS>1.196,63</ValorICMS>
-    </itens>
-  </arquivo>
-  <arquivo id="3" nome="EMP 16 FL 1008031-3742307-NOTA FISCAL Nº 021.050.514 - Série 002 OK.pdf">
-    <cabecalho>
-      <TipoDocumento>nfcee</TipoDocumento>
-      <EspecieDocumento>nfcee</EspecieDocumento>
-      <DataEmissao>25/07/2025</DataEmissao>
-      <NumeroDocumento>021.050.514</NumeroDocumento>
-      <Serie>2</Serie>
-      <CnpjConsumidor>10425282003148</CnpjConsumidor>
-      <ValorTotal>51,04</ValorTotal>
-      <CodigoCliente>6/3742307-6</CodigoCliente>
-      <ReferenciaMesAno>Julho/2025</ReferenciaMesAno>
-      <DataVencimento>16/08/2025</DataVencimento>
-    </cabecalho>
-    <itens>
-      <ValorConsumo>16,53</ValorConsumo>
-      <ValorTaxas>34,51</ValorTaxas>
-      <BaseCalculoICMS>34,33</BaseCalculoICMS>
-      <AliquotaICMS>17,00</AliquotaICMS>
-      <ValorICMS>5,83</ValorICMS>
-    </itens>
-  </arquivo>
-  <arquivo id="4" nome="EMP 16 FL 1008035-2157769-NOTA FISCAL Nº 020.841.558 - Série 002 OK.pdf">
-    <cabecalho>
-      <TipoDocumento>nfcee</TipoDocumento>
-      <EspecieDocumento>nfcee</EspecieDocumento>
-      <DataEmissao>18/07/2025</DataEmissao>
-      <NumeroDocumento>020.841.558</NumeroDocumento>
-      <Serie>2</Serie>
-      <CnpjConsumidor>10425282003571</CnpjConsumidor>
-      <ValorTotal>50.679,87</ValorTotal>
-      <CodigoCliente>6/2157769-7</CodigoCliente>
-      <ReferenciaMesAno>Julho/2025</ReferenciaMesAno>
-      <DataVencimento>16/08/2025</DataVencimento>
-    </cabecalho>
-    <itens>
-      <ValorConsumo>47.170,36</ValorConsumo>
-      <ValorTaxas>3.509,51</ValorTaxas>
-      <BaseCalculoICMS>104.483,67</BaseCalculoICMS>
-      <AliquotaICMS>17,00</AliquotaICMS>
-      <ValorICMS>17.762,23</ValorICMS>
-    </itens>
-  </arquivo>
-  <arquivo id="5" nome="EMP 16 FL 1008037-2033593-NOTA FISCAL Nº 020.541.318 - Série 002 OK.pdf">
-    <cabecalho>
-      <TipoDocumento>nfcee</TipoDocumento>
-      <EspecieDocumento>nfcee</EspecieDocumento>
-      <DataEmissao>09/07/2025</DataEmissao>
-      <NumeroDocumento>020.541.318</NumeroDocumento>
-      <Serie>2</Serie>
-      <CnpjConsumidor>10425282003733</CnpjConsumidor>
-      <ValorTotal>0,01</ValorTotal>
-      <CodigoCliente>6/2033593-1</CodigoCliente>
-      <ReferenciaMesAno>Julho/2025</ReferenciaMesAno>
-      <DataVencimento>16/08/2025</DataVencimento>
-    </cabecalho>
-    <itens>
-      <ValorConsumo>0,00</ValorConsumo>
-      <BaseCalculoICMS>0,00</BaseCalculoICMS>
-      <AliquotaICMS>0,00</AliquotaICMS>
-      <ValorICMS>0,00</ValorICMS>
-    </itens>
-  </arquivo>
-  <arquivo id="6" nome="EMP 16 FL 1008038-1517133-NOTA FISCAL Nº 020.758.486 - Série 002 OK.pdf">
-    <cabecalho>
-      <TipoDocumento>nfcee</TipoDocumento>
-      <EspecieDocumento>nfcee</EspecieDocumento>
-      <DataEmissao>16/07/2025</DataEmissao>
-      <NumeroDocumento>020.758.486</NumeroDocumento>
+      <DataEmissao>18/09/2025</DataEmissao>
+      <NumeroDocumento>022.245.849</NumeroDocumento>
       <Serie>2</Serie>
       <CnpjConsumidor>10425282003814</CnpjConsumidor>
-      <ValorTotal>125.513,12</ValorTotal>
+      <ValorTotal>221.945,15</ValorTotal>
       <CodigoCliente>6/1517133-3</CodigoCliente>
-      <ReferenciaMesAno>Julho/2025</ReferenciaMesAno>
-      <DataVencimento>16/08/2025</DataVencimento>
+      <ReferenciaMesAno>Setembro/2025</ReferenciaMesAno>
+      <DataVencimento>16/10/2025</DataVencimento>
     </cabecalho>
     <itens>
-      <ValorConsumo>125.513,12</ValorConsumo>
-      <BaseCalculoICMS>90.649,50</BaseCalculoICMS>
+      <ValorConsumo>221.945,15</ValorConsumo>
+      <BaseCalculoICMS>198.335,50</BaseCalculoICMS>
       <AliquotaICMS>17,00</AliquotaICMS>
-      <ValorICMS>15.410,42</ValorICMS>
-    </itens>
-  </arquivo>
-  <arquivo id="7" nome="EMP 16 FL 1008063-952917-NOTA FISCAL Nº 020.744.180 - Série 002 OK.pdf">
-    <cabecalho>
-      <TipoDocumento>nfcee</TipoDocumento>
-      <EspecieDocumento>nfcee</EspecieDocumento>
-      <DataEmissao>16/07/2025</DataEmissao>
-      <NumeroDocumento>020.744.180</NumeroDocumento>
-      <Serie>2</Serie>
-      <CnpjConsumidor>10425282006325</CnpjConsumidor>
-      <ValorTotal>2.608,28</ValorTotal>
-      <CodigoCliente>6/952917-3</CodigoCliente>
-      <ReferenciaMesAno>Julho/2025</ReferenciaMesAno>
-      <DataVencimento>16/08/2025</DataVencimento>
-    </cabecalho>
-    <itens>
-      <ValorConsumo>2.608,28</ValorConsumo>
-      <BaseCalculoICMS>0,00</BaseCalculoICMS>
-      <AliquotaICMS>0,00</AliquotaICMS>
-      <ValorICMS>0,00</ValorICMS>
-    </itens>
-  </arquivo>
-  <arquivo id="8" nome="EMP 16 FL 1008081-4675840-NOTA FISCAL Nº 021.095.932 - Série 002 OK.pdf">
-    <cabecalho>
-      <TipoDocumento>nfcee</TipoDocumento>
-      <EspecieDocumento>nfcee</EspecieDocumento>
-      <DataEmissao>28/07/2025</DataEmissao>
-      <NumeroDocumento>021.095.932</NumeroDocumento>
-      <Serie>2</Serie>
-      <CnpjConsumidor>10425282008107</CnpjConsumidor>
-      <ValorTotal>94,26</ValorTotal>
-      <CodigoCliente>6/4675840-5</CodigoCliente>
-      <ReferenciaMesAno>Julho/2025</ReferenciaMesAno>
-      <DataVencimento>16/08/2025</DataVencimento>
-    </cabecalho>
-    <itens>
-      <ValorConsumo>89,57</ValorConsumo>
-      <ValorTaxas>4,69</ValorTaxas>
-      <BaseCalculoICMS>25,88</BaseCalculoICMS>
-      <AliquotaICMS>12,00</AliquotaICMS>
-      <ValorICMS>3,10</ValorICMS>
-    </itens>
-  </arquivo>
-  <arquivo id="9" nome="EMP 22 FL 8B01001-2789122-NOTA FISCAL Nº 020.663.927 - Série 002 ok.pdf">
-    <cabecalho>
-      <TipoDocumento>nfcee</TipoDocumento>
-      <EspecieDocumento>nfcee</EspecieDocumento>
-      <DataEmissao>14/07/2025</DataEmissao>
-      <NumeroDocumento>020.663.927</NumeroDocumento>
-      <Serie>2</Serie>
-      <CnpjConsumidor>22933858000141</CnpjConsumidor>
-      <ValorTotal>45.890,13</ValorTotal>
-      <CodigoCliente>6/2789122-5</CodigoCliente>
-      <ReferenciaMesAno>Julho/2025</ReferenciaMesAno>
-      <DataVencimento>16/08/2025</DataVencimento>
-    </cabecalho>
-    <itens>
-      <ValorConsumo>45.890,13</ValorConsumo>
-      <BaseCalculoICMS>0,00</BaseCalculoICMS>
-      <AliquotaICMS>0,00</AliquotaICMS>
-      <ValorICMS>0,00</ValorICMS>
+      <ValorICMS>33.717,03</ValorICMS>
     </itens>
   </arquivo>
 </NotaFiscalEnergia>

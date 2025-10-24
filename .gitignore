@@ -47,3 +47,4 @@ src_moreno/service/__pycache__/
 src_moreno/utils/__pycache__/
 
 **/config_db.py
+src/resource/*
