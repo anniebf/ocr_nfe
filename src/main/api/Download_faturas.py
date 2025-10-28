@@ -7,6 +7,7 @@ import re
 from curl_cffi import requests as curl_requests
 from dotenv import load_dotenv
 from datetime import datetime
+import logging
 
 load_dotenv()
 
@@ -15,6 +16,16 @@ ano_atual = datetime.now().year
 if mes_atual < 10:
     mes_atual = f'0{mes_atual}'
 
+logging.basicConfig(
+    level=logging.INFO,  # Pode ser DEBUG, INFO, WARNING, ERROR, CRITICAL
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.FileHandler("energisa_automacao.log", encoding='utf-8'),
+        logging.StreamHandler()  # Mostra também no console
+    ]
+)
+
+error_uc=[]
 
 class EnergisaAutomacao:
     BASE_URL = "https://servicos.energisa.com.br"
@@ -35,27 +46,31 @@ class EnergisaAutomacao:
         self.login_completo = False
 
     def executar_login_automatico(self):
-        print("INICIANDO LOGIN AUTOMÁTICO...")
+        logging.info("Iniciando login automático...")
 
         if not self._obter_cookies_e_token():
+            logging.error("Falha ao obter cookies e token.")
             return False
 
         unidade_login = {"codigoEmpresaWeb": "6", "cdc": "3359145", "digitoVerificador": "4", "posicao": "0"}
-        print(f"Usando unidade para login: Uc {unidade_login['cdc']}")
+        logging.info(f"Usando unidade para login: UC {unidade_login['cdc']}")
 
         if not self._solicitar_codigo_com_unidade(unidade_login):
+            logging.error("Falha ao solicitar código de segurança.")
             return False
 
         codigo = self._buscar_codigo_seguranca()
         if not codigo:
-            print("ERRO: Codigo não foi encontrado")
+            logging.error("Código de segurança não encontrado.")
             return False
 
         if self._validar_codigo(codigo):
             self.login_completo = True
-            print("LOGIN CONCLUÍDO COM SUCESSO!")
+            logging.info("Login concluído com sucesso.")
             self.unidades_encontradas = self.consultar_unidades_consumidoras()
             return True
+
+        logging.warning("Validação de código falhou.")
         return False
 
     def _obter_cookies_e_token(self):
@@ -65,10 +80,10 @@ class EnergisaAutomacao:
             auth_data = response.json()
             if auth_data.get("autenticated"):
                 self.access_token = auth_data.get('accessTokenEnergisa')
-                print("Token de acesso obtido")
+                logging.info("Token de acesso obtido")
                 return True
         except Exception as e:
-            print(f"Falha na autenticação: {e}")
+            logging.error(f"Falha na autenticação: {e}")
         return False
 
     def _solicitar_codigo_com_unidade(self, unidade):
@@ -78,14 +93,14 @@ class EnergisaAutomacao:
                 f"{self.BASE_URL}/api/autenticacao/CodigoSeguranca/EmailPorUC",
                 params=unidade, json=payload, timeout=15, impersonate="chrome110"
             )
-            print("Código solicitado")
+            logging.info("Código solicitado")
             return response.ok
         except Exception as e:
-            print(f"Falha ao solicitar código: {e}")
+            logging.error(f"Falha ao solicitar código: {e}")
             return False
 
     def _buscar_codigo_seguranca(self, max_tentativas=8, intervalo=10, espera_inicial=30):
-        print(f"Aguardando {espera_inicial}s para email...")
+        logging.info(f"Aguardando {espera_inicial}s para email...")
         time.sleep(espera_inicial)
 
         graph_token = self._obter_token_graph()
@@ -93,14 +108,14 @@ class EnergisaAutomacao:
             return None
 
         for tentativa in range(max_tentativas):
-            print(f"Tentativa {tentativa + 1}/{max_tentativas}...")
+            logging.info(f"Tentativa {tentativa + 1}/{max_tentativas}...")
             emails = self._buscar_emails(graph_token)
 
             for email in emails:
                 if self._is_email_valido(email):
                     codigo = self._extrair_codigo_html(email.get('body', {}).get('content', ''))
                     if codigo:
-                        print(f"CÓDIGO ENCONTRADO: {codigo}")
+                        logging.info(f"CÓDIGO ENCONTRADO: {codigo}")
                         return codigo
 
             if tentativa < max_tentativas - 1:
@@ -109,6 +124,7 @@ class EnergisaAutomacao:
 
     def _obter_token_graph(self):
         try:
+            logging.debug("Obtendo token do Microsoft Graph...")
             autoridade = f"https://login.microsoftonline.com/{os.getenv('GRAPH_TENANT_ID')}"
             aplicacao = msal.ConfidentialClientApplication(
                 client_id=os.getenv('GRAPH_CLIENT_ID'),
@@ -116,8 +132,14 @@ class EnergisaAutomacao:
                 client_credential=os.getenv('GRAPH_CLIENT_SECRET')
             )
             resultado = aplicacao.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
-            return resultado.get('access_token')
-        except:
+            token = resultado.get('access_token')
+            if token:
+                logging.info("Token Graph obtido com sucesso.")
+            else:
+                logging.error(f"Falha ao obter token Graph: {resultado}")
+            return token
+        except Exception as e:
+            logging.exception("Erro ao obter token Graph")
             return None
 
     def _buscar_emails(self, token):
@@ -182,13 +204,13 @@ class EnergisaAutomacao:
         }
 
         try:
-            print("Consultando unidades...")
+            logging.info("Consultando unidades...")
             response = self.session.post(url, json=payload, timeout=15, impersonate="chrome110")
             resposta = response.json()
 
             unidades_data = resposta.get("infos", [])
 
-            print(f" {len(unidades_data)} unidades encontradas:")
+            logging.info(f" {len(unidades_data)} unidades encontradas:")
 
             unidades_mapeadas = []
             for uc in unidades_data:
@@ -201,13 +223,17 @@ class EnergisaAutomacao:
                     'cidade': uc.get('nomeMunicipio'),
                     'situacao': 'ATIVA' if uc.get('ucAtiva') else 'INATIVA'
                 }
-                unidades_mapeadas.append(unidade)
-                print(f"  UC: {unidade['cdc']} | {unidade['nome']} | STATUS: {unidade['situacao']}")
+                if unidade['situacao'] == 'INATIVA':
+                    pass
+                else:
+                    unidades_mapeadas.append(unidade)
+                    logging.info(f"  UC: {unidade['codigoEmpresaWeb']}/{unidade['cdc']}-{unidade['digitoVerificadorCdc']} | {unidade['nome']} | STATUS: {unidade['situacao']}")
+            #print(f"{unidades_mapeadas} ")
 
             return unidades_mapeadas
 
         except Exception as e:
-            print(f"Erro ao consultar unidades: {e}")
+            logging.error(f"Erro ao consultar unidades: {e}")
             return []
 
     def baixar_fatura_direto(self, cdc, digito_verificador, codigo_empresa, mes=mes_atual, ano=ano_atual):
@@ -215,8 +241,7 @@ class EnergisaAutomacao:
         if not self.login_completo or not cdc:
             return False
 
-        print(f"\nINICIANDO DOWNLOAD DA FATURA PARA CDC {cdc}...")
-
+        logging.info(f"\nINICIANDO DOWNLOAD DA FATURA PARA CDC {cdc}...")
         # Paylod usando as mesma chamadas do postman
         payload = {
             "codigoEmpresaWeb": codigo_empresa,
@@ -232,9 +257,6 @@ class EnergisaAutomacao:
             "refreshToken": self.refresh_token,
             "retk": self.retk_token
         }
-
-        #print("PAYLOAD ENVIADO:")
-        #print(json.dumps(payload, indent=2))
 
         # Headers iguais ao usados no postman
         headers = {
@@ -252,7 +274,7 @@ class EnergisaAutomacao:
                 impersonate="chrome110"
             )
 
-            print(f"Status: {response.status_code}")
+            logging.info(f"Status: {response.status_code}")
 
             if response.status_code == 200:
                 if response.content.startswith(b'%PDF'):
@@ -263,16 +285,18 @@ class EnergisaAutomacao:
                     with open(nome_arquivo, 'wb') as f:
                         f.write(response.content)
 
-                    print(f"PDF salvo: {nome_arquivo}")
+                    logging.info(f"PDF salvo: {nome_arquivo}")
                     return True
                 else:
-                    print("Resposta não é PDF válido")
-                    print(f"Conteúdo: {response.text[:200]}...")
+                    logging.error("Resposta não é PDF válido")
+                    logging.error(f"Conteúdo: {response.text[:200]}...")
+                    error_uc.append(fr"{cdc}-{digito_verificador}")
             else:
-                print(f"Erro {response.status_code}: {response.text}")
+                logging.info(f"Erro {response.status_code}: {response.text}")
+                error_uc.append(fr"{cdc}-{digito_verificador}")
 
         except Exception as e:
-            print(f"Erro no download: {e}")
+            logging.error(f"Erro no download: {e}")
 
         return False
 
@@ -281,10 +305,10 @@ class EnergisaAutomacao:
         if not self.login_completo:
             return False
 
-        print(f"\nBAIXANDO FATURAS DE {mes}/{ano} PARA TODAS AS UNIDADES...")
+        logging.info(f"\nBAIXANDO FATURAS DE {mes}/{ano} PARA TODAS AS UNIDADES...")
 
         if not self.unidades_encontradas:
-            print("Nenhuma unidade disponível")
+            logging.info("Nenhuma unidade disponível")
             return False
 
         total_baixadas = 0
@@ -302,7 +326,8 @@ class EnergisaAutomacao:
             ):
                 total_baixadas += 1
 
-        print(f"\nTOTAL: {total_baixadas}/{len(self.unidades_encontradas)} faturas baixadas")
+        logging.info(f"\nTOTAL: {total_baixadas}/{len(self.unidades_encontradas)} faturas baixadas")
+
         return total_baixadas > 0
 
     """def baixar_faturas_multiplos_meses(self):
@@ -332,13 +357,21 @@ class EnergisaAutomacao:
         return total_geral > 0 """
 
 
-# EXECUÇÃO PRINCIPAL
 if __name__ == "__main__":
     automacao = EnergisaAutomacao(documento="10425282000122")
 
     if automacao.executar_login_automatico():
-        print("\nLOGIN CONCLUÍDO!")
-
+        logging.info("Login concluído! Iniciando download das faturas...")
         automacao.baixar_faturas_para_todas_unidades(mes=mes_atual, ano=ano_atual)
+        logging.info(f"U/C que não baixaram a fatura: {error_uc}")
     else:
-        print("FALHA NO LOGIN")
+        logging.error("Falha no login.")
+
+#Classe EnergisaAutomacao - encapsula o comportamento e os dados para interagir com o site da energisa | a classe define as características (atributos) e as ações (métodos) que um objeto deve ter
+#Metodos/Funções - Os métodos são as funções definidas dentro da classe. Eles definem o que o objeto pode fazer.
+#Atributos/dados -o número do documento/ os tokens de autenticacao (access_token, udk_token, etc.)/ e a sessão de requisicoes (self.session) | atributos são variáveis que armazenam o estado de um objeto
+
+#Session() = representa uma Sessão HTTP persistente
+#o HTTP (o protocolo da Web) é "sem estado". Isso significa que, se você fizer duas requisições consecutivas (por exemplo, primeiro para a página de login e depois para a página de faturas), o servidor não tem como saber que as duas requisições vieram do mesmo usuário.
+#O self.session é um objeto que armazena e reutiliza automaticamente dados importantes em várias requisições, simulando a continuidade de um navegador
+#
