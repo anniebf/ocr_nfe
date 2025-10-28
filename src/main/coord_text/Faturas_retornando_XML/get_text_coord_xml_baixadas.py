@@ -8,18 +8,18 @@ from concurrent.futures import ThreadPoolExecutor
 from dicttoxml import dicttoxml
 from database.connect_oracle import retorno_cnpj_pdf
 from xml.dom.minidom import parseString, Node, Document  # Importação de Document
-import os
+from time import sleep
 
 # CONFIGURAÇÃO
-PASTA_PDFS = r"C:\bf_ocr\src\resource\pdf"
+PASTA_PDFS = r"C:\bf_ocr\src\resource\pdf_refaturado"
 PASTA_XML="C:\\bf_ocr\\\src\\resource\\xml"
 
 regioes = {
-    "mais_a_cima": {"coordenadas": [(139.9, 4.1), (142.6, 46.2), (465.8, 42.1), (461.7, 6.8)],
+    "mais_a_cima": {"coordenadas": [(145.3, 4.1), (146.6, 54.3), (464.3, 54.3), (462.9, 6.8)],
                     "descricao": "Área mais acima"},
     "roteiro_tensao": {"coordenadas": [(43.5, 81.5), (40.7, 157.5), (319.1, 150.7), (306.9, 84.2)],
                        "descricao": "Roteiro e tensão"},
-    "nota_fiscal_protocolo": {"coordenadas": [(422.4, 196.9), (423.7, 282.5), (559.5, 279.8), (559.5, 202.4)],
+    "nota_fiscal_protocolo": {"coordenadas": [(419.5, 190.1), (418.1, 270.2), (552.5, 271.5), (549.8, 188.7)],
                               "descricao": "Nota fiscal e protocolo"},
     "nome_endereco": {"coordenadas": [(42.1, 160.3), (44.8, 201.0), (232.2, 196.9), (229.5, 163.0)],
                       "descricao": "Nome e endereço"},
@@ -27,12 +27,12 @@ regioes = {
                        "descricao": "Código do cliente"},
     "ref_total_pagar": {"coordenadas": [(44.8, 260.7), (46.2, 285.2), (320.5, 282.5), (325.9, 252.6)],
                         "descricao": "Referência e total a pagar"},
-    "tributos": {"coordenadas": [(444.1, 376.2), (563.6, 374.8), (445.4, 407.4), (566.3, 406.1)],
+    "tributos": {"coordenadas": [(434.4, 338.0), (556.6, 332.6), (434.4, 391.0), (559.3, 388.3)],
                  "descricao": "Tributos"},
-    "tabela_itens": {"coordenadas": [(21.7, 361.2), (444.1, 571.7)],
+    "tabela_itens": {"coordenadas": [(16.3, 334.0), (437.1, 545.7)],
                      "descricao": "Tabela de itens da fatura"},
-    "cnpj": {"coordenadas": [(43.9, 221.3), (159.8, 234.9), (43.1, 241.3), (159.0, 240.5)],
-             "descricao": "cnpj"}
+    "cnpj": {"coordenadas": [(43.9, 216.4), (167.7, 235.6), (43.9, 236.4), (166.1, 214.8)],
+                 "descricao": "cnpj"}
 }
 
 ITENS_A_EXCLUIR_DO_CONSUMO = [
@@ -86,6 +86,7 @@ def normalizar_valor(valor_str: str,) -> float:
 
     except ValueError:
         return 0.0
+
 
 def remove_empty_values(d: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -212,14 +213,13 @@ def processar_tabela_itens(linhas: List[Dict[str, Any]], pdf_path: str) -> List[
 def processar_cnpj(texto: str, nome_titular="") -> dict:
     resultado = {}
     linhas = texto.split('\n')
-
     num_cnpj = re.findall(r'\d', linhas[0])
     ult_num = (num_cnpj[-3:])
     prim_num = (num_cnpj[0])
     ult_num = ''.join(ult_num)
     #print(ult_num)
 
-    #print(linhas[1])
+    #print(linhas)
     num_insc = re.findall(r'\d+', linhas[1])
     num_insc = ''.join(num_insc)
 
@@ -358,7 +358,8 @@ def processar_regiao_parallel(caminho_pdf):
             continue
 
         texto = extrair_texto_nas_coordenadas(caminho_pdf, calcular_retangulo(info_regiao['coordenadas']))
-
+        #sleep(1)
+        #print(texto)
         if nome_regiao == 'tributos':
             tributos_data = processar_tributos(texto)
         elif nome_regiao == 'ref_total_pagar':
@@ -466,7 +467,9 @@ def extrair_informacoes_estruturadas(resultado_plano: Dict[str, Any], tributos_d
     cnpj_dados_brutos = resultado_plano.get('cnpj', {})
     cnpj_completo_valor = ""
     if isinstance(cnpj_dados_brutos, dict):
+
         cnpj_completo_valor = cnpj_dados_brutos.get("cnpj_consumidor", "")
+        #print(cnpj_completo_valor)
     elif isinstance(cnpj_dados_brutos, list) and len(cnpj_dados_brutos) > 0:
         if isinstance(cnpj_dados_brutos[0], list) and len(cnpj_dados_brutos[0]) > 0:
             cnpj_completo_valor = cnpj_dados_brutos[0][0]
@@ -554,8 +557,6 @@ def filtrar_faturas_duplicadas(todas_faturas: List[Dict[str, Any]]) -> List[Dict
     return [fatura for _, fatura in faturas_por_cliente.values()]
 
 
-# A sua lista de importações já tem tudo que é necessário (Document, os, etc.)
-
 def salvar_xmls_por_cnpj(faturas_dados: List[Dict[str, Any]], pasta_saida: str):
     """
     Converte as faturas em strings XML separadas e as salva na pasta de saída,
@@ -574,14 +575,17 @@ def salvar_xmls_por_cnpj(faturas_dados: List[Dict[str, Any]], pasta_saida: str):
 
     # 3. Salva cada XML, usando o CNPJ e o nome do arquivo original no nome.
     for i, xml_string in enumerate(lista_xml_strings):
-        dados_fatura = faturas_dados[i]  # Usa o índice para obter os metadados do dict original
+        dados_fatura = faturas_dados[i]
+        #print(dados_fatura)# Usa o índice para obter os metadados do dict original
 
         # Extrai CNPJ e Nome do Arquivo para o nome do arquivo XML
-        cnpj_consumidor = dados_fatura.get('cabecalho', {}).get('CnpjConsumidor')
+        #cnpj_consumidor = dados_fatura.get('cabecalho', {}).get('CnpjConsumidor')
+        uc = dados_fatura.get('cabecalho', {}).get('CodigoCliente')
         nome_original_pdf = dados_fatura.get('@nome', f"arquivo_{i}.pdf")
-
+        unidade_consumidora = uc.replace('\\', '').replace('/', '').replace('-', '')
         # O CNPJ é crucial para o agrupamento/nome
-        if not cnpj_consumidor:
+        #print(cnpj_consumidor)
+        if not uc:
             print(f"Aviso: CNPJ não encontrado para o arquivo {nome_original_pdf}. Pulando salvamento.")
             continue
 
@@ -589,7 +593,8 @@ def salvar_xmls_por_cnpj(faturas_dados: List[Dict[str, Any]], pasta_saida: str):
         nome_base = Path(nome_original_pdf).stem
 
         # Define o nome do arquivo: [CNPJ]-[NomeOriginalPDF].xml
-        nome_arquivo_saida = f"{cnpj_consumidor}.xml"
+
+        nome_arquivo_saida = f"{unidade_consumidora}.xml"
         caminho_saida = Path(pasta_saida) / nome_arquivo_saida
 
         try:
@@ -598,6 +603,7 @@ def salvar_xmls_por_cnpj(faturas_dados: List[Dict[str, Any]], pasta_saida: str):
             print(f"XML salvo com sucesso: {caminho_saida.name}")
         except Exception as e:
             print(f"Erro ao salvar o arquivo {nome_arquivo_saida}: {e}")
+
 
 def converter_lote_para_xml_separado(lote_dados: List[Dict[str, Any]]) -> List[str]:
     """
@@ -641,7 +647,7 @@ def converter_lote_para_xml_separado(lote_dados: List[Dict[str, Any]]) -> List[s
 
             # 3. Ajuste para forçar tags vazias
             tags_para_forcar_abertura = [
-                'CnpjConsumidora',
+                'CnpjConsumidor',
                 'ValorConsumo',
                 'ValorTaxas',
                 'BaseCalculoICMS',
