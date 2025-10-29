@@ -267,7 +267,7 @@ def processar_nota_fiscal_protocolo(texto: str) -> Dict[str, Any]:
     resultado = {}
     if len(linhas) >= 1:
         nf_match = re.search(r'\b\d{3}\.\d{3}\.\d{3}\b', linhas[0])
-        resultado["numero_nota_fiscal"] = nf_match.group() if nf_match else ""
+        resultado["numero_nota_fiscal"] = nf_match.group().replace('.', '').lstrip('0') if nf_match else ""
         nf_serie = re.search(r'Série:\s*(\d+)', linhas[0])
         if nf_serie:
             num = nf_serie.group(1)
@@ -557,7 +557,7 @@ def filtrar_faturas_duplicadas(todas_faturas: List[Dict[str, Any]]) -> List[Dict
     return [fatura for _, fatura in faturas_por_cliente.values()]
 
 
-def salvar_xmls_por_cnpj(faturas_dados: List[Dict[str, Any]], pasta_saida: str):
+def salvar_xmls_por_uc(faturas_dados: List[Dict[str, Any]], pasta_saida: str):
     """
     Converte as faturas em strings XML separadas e as salva na pasta de saída,
     agrupadas/nomeadas com base no CNPJ.
@@ -636,7 +636,6 @@ def converter_lote_para_xml_separado(lote_dados: List[Dict[str, Any]]) -> List[s
 
                     # Adapte a lógica: os atributos 'id' e 'nome' devem ir para o <NotaFiscalEnergia>
                     if key_name == '@id':
-                        root.setAttribute('id', key_value)
                         keys_to_remove.append(child)
                     elif key_name == '@nome':
                         root.setAttribute('nome', key_value)
@@ -700,7 +699,7 @@ def main():
 
     if todas_faturas:
         faturas_filtradas = filtrar_faturas_duplicadas(todas_faturas)
-        salvar_xmls_por_cnpj(faturas_filtradas, PASTA_XML)
+        salvar_xmls_por_uc(faturas_filtradas, PASTA_XML)
         print("\nProcessamento concluído. XMLs salvos na pasta:", PASTA_XML)
 
 
