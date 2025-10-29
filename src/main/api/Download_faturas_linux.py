@@ -20,7 +20,7 @@ logging.basicConfig(
     level=logging.INFO,  # Pode ser DEBUG, INFO, WARNING, ERROR, CRITICAL
     format='%(asctime)s [%(levelname)s] %(message)s',
     handlers=[
-        logging.FileHandler(fr"./logs/{datetime.now().strftime("%d-%m-%yyyy")}_downloads_faturas_energisa.log", encoding='utf-8'),
+        logging.FileHandler(fr"./logs/{datetime.now().strftime('%d-%m-%yyyy')}_downloads_faturas_energisa.log", encoding='utf-8'),
         logging.StreamHandler()  # Mostra também no console
     ]
 )
@@ -34,7 +34,7 @@ class EnergisaAutomacao:
         self.documento = documento
         self.session = curl_requests.Session()
         self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             'Content-Type': 'application/json'
         })
         self.access_token = None
@@ -184,10 +184,10 @@ class EnergisaAutomacao:
                 self.utk_token = infos.get("utk", "")
                 self.refresh_token = infos.get("refreshToken", "")
                 self.retk_token = infos.get("retk", "")
-                print(" Token da Energisa validado")
+                logging.info(" Token da Energisa validado")
                 return True
         except Exception as e:
-            print(f" Falha na validação: {e}")
+            logging.info(f" Falha na validação: {e}")
         return False
 
     def consultar_unidades_consumidoras(self):
@@ -228,7 +228,7 @@ class EnergisaAutomacao:
                 else:
                     unidades_mapeadas.append(unidade)
                     logging.info(f"  UC: {unidade['codigoEmpresaWeb']}/{unidade['cdc']}-{unidade['digitoVerificadorCdc']} | {unidade['nome']} | STATUS: {unidade['situacao']}")
-            #print(f"{unidades_mapeadas} ")
+
 
             return unidades_mapeadas
 
@@ -279,7 +279,7 @@ class EnergisaAutomacao:
             if response.status_code == 200:
                 if response.content.startswith(b'%PDF'):
                     # Salva o PDF
-                    nome_arquivo = f"faturas/fatura_{ano}-{mes:02d}_UC_{cdc}.pdf"
+                    nome_arquivo = fr"faturas/Data_{ano}-{mes:02d}_UC_{codigo_empresa}{cdc}{digito_verificador}.pdf"
                     os.makedirs("../faturas", exist_ok=True)
 
                     with open(nome_arquivo, 'wb') as f:
@@ -329,32 +329,6 @@ class EnergisaAutomacao:
         logging.info(f"\nTOTAL: {total_baixadas}/{len(self.unidades_encontradas)} faturas baixadas")
 
         return total_baixadas > 0
-
-    """def baixar_faturas_multiplos_meses(self):
-        #Baixa faturas dos últimos meses para todas as unidades
-        if not self.login_completo:
-            return False
-
-        # Tentar os últimos 3 meses
-        meses_para_tentar = [
-            (10, 2025),
-            (9, 2025),
-            (8, 2025),
-        ]
-
-        total_geral = 0
-
-        for mes, ano in meses_para_tentar:
-            print(f"\n{'=' * 60}")
-            print(f"TENTANDO MÊS: {mes}/{ano}")
-            print(f"{'=' * 60}")
-
-            baixadas_mes = self.baixar_faturas_para_todas_unidades(mes, ano)
-            if baixadas_mes:
-                total_geral += baixadas_mes
-
-        print(f"\nTOTAL GERAL: {total_geral} faturas baixadas")
-        return total_geral > 0 """
 
 
 if __name__ == "__main__":
